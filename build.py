@@ -42,9 +42,6 @@ class PageBuilder(HTMLParser):
         return " " + functools.reduce(lambda a,b: f'{a} {b}', attrs)
     
     # default handlers: in -> out
-    def handle_starttag(self, tag, attrs):
-        self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
-    
     def handle_endtag(self, tag):
         self.ofile.write(f'</{tag}>')
     
@@ -53,6 +50,19 @@ class PageBuilder(HTMLParser):
 
     def handle_decl(self, decl):
         self.ofile.write(f'<!{decl}>')
+
+    # hash css files
+    def handle_starttag(self, tag, attrs):
+        if tag == 'link':
+            csspath = list(filter(lambda x: x[0] == 'href', attrs))[0][1] # extract path to css file
+            csspath = os.path.normpath(csspath)
+            csspath = os.path.join(os.path.dirname(self.ofilepath), csspath)
+            assert os.path.exists(csspath) # make sure image exists
+            newpath = self.imghash(csspath, 'css')
+            if not self.mainpg:
+                newpath = os.path.join('..', newpath)
+            attrs = list(map(lambda x: (x[0], newpath) if x[0] == 'href' else x, attrs))
+        self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
 
     # Markdown handler
     def handle_startendtag(self, tag, attrs):
@@ -63,7 +73,7 @@ class PageBuilder(HTMLParser):
             imgpath = os.path.normpath(imgpath)
             imgpath = os.path.join(self.srcdir, imgpath)
             assert os.path.exists(imgpath) # make sure image exists
-            newpath = self.imghash(imgpath)
+            newpath = self.imghash(imgpath, 'images')
             if not self.mainpg:
                 newpath = os.path.join('..', newpath)
             attrs = list(map(lambda x: (x[0], newpath) if x[0] == 'src' else x, attrs))
@@ -97,30 +107,30 @@ class SiteBuilder:
         super().__init__()
         self.srcdir = src_base
         self.builddir = build_base
-        self.images = {}
+        self.hashed_files = {}
     
-    def image_hash(self, imgpath, *, save=True):
+    def file_hash(self, filepath, destdir, *, save=True):
         # TODO: use os.path.samefile to check for equality; shouldn't need this with abspath (below)
-        if imgpath.startswith('http'): # TODO: hack for checking for web urls
-            return imgpath
-        imgpath = os.path.abspath(imgpath)
-        if imgpath in self.images:
-            return self.images[imgpath]
+        if filepath.startswith('http'): # TODO: hack for checking for web urls
+            return filepath
+        filepath = os.path.abspath(filepath)
+        if filepath in self.hashed_files:
+            return self.hashed_files[filepath]
 
         hasher = hashlib.md5()
         BLOCKSIZE = 65536
-        with open(imgpath, 'rb') as img:
+        with open(filepath, 'rb') as img:
             buf = img.read(BLOCKSIZE)
             while len(buf) > 0:
                 hasher.update(buf)
                 buf = img.read(BLOCKSIZE)
 
-        origname = os.path.basename(os.path.normpath(imgpath))
+        origname = os.path.basename(os.path.normpath(filepath))
         lastdot = origname.rfind('.')
         newname = f'{origname[:lastdot]}.{hasher.hexdigest()}.{origname[lastdot+1:]}'
         if save:
-            self.images[imgpath] = os.path.join('images', newname)
-            return self.images[imgpath]
+            self.hashed_files[filepath] = os.path.join(destdir, newname)
+            return self.hashed_files[filepath]
         else:
             return newname
         
@@ -139,7 +149,8 @@ class SiteBuilder:
 
         # replace images
         cssFile = cssutils.parseFile(ocsspath)
-        cssutils.replaceUrls(cssFile, lambda x: os.path.join('..',self.image_hash(os.path.join('src','scss',os.path.normpath(x)))), ignoreImportRules=True)
+        cssutils.replaceUrls(cssFile, 
+            lambda x: os.path.join('..',self.file_hash(os.path.join('src','scss',os.path.normpath(x)), 'images')), ignoreImportRules=True)
         with open(ocsspath, 'wb') as css:
             css.write(cssFile.cssText)
 
@@ -166,21 +177,23 @@ class SiteBuilder:
             print(build_file)
             print(main_page)
             print()
-            with PageBuilder(src_dir, build_base, build_file, self.image_hash, main_page) as pb:
+            with PageBuilder(src_dir, build_base, build_file, self.file_hash, main_page) as pb:
                 with open(os.path.join(path, filename)) as f:
                     data = f.read()
                 pb.feed(data)
 
-        # images
-        print(self.images)
+        # images and css (hashed files)
+        print(self.hashed_files)
         os.makedirs(os.path.join(self.builddir, 'images'))
-        for src in self.images:
-            dst = self.images[src]
+        for src in self.hashed_files:
+            dst = self.hashed_files[src]
             dst = os.path.join(self.builddir, dst)
             print(f'{src}->{dst}')
             if not os.path.exists(dst):
                 shutil.copyfile(src, dst)
 
+        # delete unhashed css file
+        os.remove(os.path.join(self.builddir, 'css', 'main.css'))
 
 
 if __name__ == '__main__':
