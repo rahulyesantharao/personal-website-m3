@@ -100,9 +100,10 @@ class SiteBuilder:
         self.images = {}
     
     def image_hash(self, imgpath, *, save=True):
-        # TODO: use os.path.samefile to check for equality
+        # TODO: use os.path.samefile to check for equality; shouldn't need this with abspath (below)
         if imgpath.startswith('http'): # TODO: hack for checking for web urls
             return imgpath
+        imgpath = os.path.abspath(imgpath)
         if imgpath in self.images:
             return self.images[imgpath]
 
