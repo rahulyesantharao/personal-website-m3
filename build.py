@@ -159,7 +159,6 @@ class PageBuilder(HTMLBuilder):
             newpath = self._replace_src(src_file, src_dir, dest_dir)
             attrs[:] = map(lambda x: (x[0], newpath.replace('\\', '/')) if x[0] == attr_name else x, attrs)
 
-    # hash css files
     def handle_starttag(self, tag, attrs):
         '''Parses start tags, and hashes the included local CSS files.
 
@@ -174,7 +173,6 @@ class PageBuilder(HTMLBuilder):
                     lambda x: not x.startswith('http'))
         self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
 
-    # Build handler
     def handle_startendtag(self, tag, attrs):
         '''Parses start/end tags (`<.../>`), and performs the necessary compile steps.
 
@@ -191,7 +189,7 @@ class PageBuilder(HTMLBuilder):
         elif tag == 'snippet':
             attrs = dict(attrs)
             with open(os.path.join(self.srcdir, os.path.normpath(attrs['src'])), 'r') as snippet:
-                data = snippet.read().replace('\n', '')
+                data = snippet.read()
             data = re.sub(r'{{ (.*?) }}', lambda x: attrs[x.group(1)], data)
             self.ofile.write(data)
         elif tag == 'img':
@@ -260,9 +258,11 @@ class SiteBuilder:
         assert not os.path.exists(self.builddir) # make sure it doesn't exist
         
         # favicons
+        print('* Copying Favicons')
         shutil.copytree(f'{self.srcdir}/favicons', f'{self.builddir}/') # copy over favicons, create builddir
 
         # sass
+        print('* Compiling SCSS')
         os.makedirs(os.path.join(self.builddir, 'css'))
         ocsspath = os.path.join(self.builddir, 'css', 'main.css')
         with open(ocsspath, 'w+') as css:
@@ -271,11 +271,13 @@ class SiteBuilder:
         # replace images
         cssFile = cssutils.parseFile(ocsspath)
         cssutils.replaceUrls(cssFile, 
-            lambda x: os.path.join('..',self.file_hash(os.path.join('src','scss',os.path.normpath(x)), 'images')).replace('\\', '/'), ignoreImportRules=True)
+            lambda x: os.path.join('..',self.file_hash(os.path.join('src','scss',os.path.normpath(x)), 'images')).replace('\\', '/'), 
+            ignoreImportRules=True)
         with open(ocsspath, 'wb') as css:
             css.write(cssFile.cssText)
 
         # html
+        print('* Gathering HTML files to build')
         html_to_build = []
         for dirpath, _, filenames in os.walk(self.srcdir):
             if(dirpath.find('snippets') == -1):
@@ -283,34 +285,28 @@ class SiteBuilder:
                     if filename.endswith(".html"):
                         html_to_build.append((dirpath, filename))
 
-        print(html_to_build)
         for path, filename in html_to_build:
             src_dir = path
+            build_file = filename
             build_base = pathlib.Path(path)
-            print(path)
-            print("becomes")
-            print(build_base.parts)
+            print(f'  - src: {path} ({build_base.parts}) : {build_file}')
             build_base = pathlib.Path(*build_base.parts[1:])
             build_base = os.path.join(self.builddir, build_base)
-            build_file = filename
             main_page = os.path.samefile(self.srcdir, path)
-            print(src_dir)
-            print(build_base)
-            print(build_file)
-            print(main_page)
-            print()
+            print(f'  - build_base: {build_base}')
+            print(f'  - main_page: {main_page}\n')
             with PageBuilder(src_dir, build_base, build_file, self.file_hash, main_page) as pb:
                 with open(os.path.join(path, filename)) as f:
                     data = f.read()
                 pb.feed(data)
 
         # images and css (hashed files)
-        print(self.hashed_files)
+        print('* Moving hashed files')
         os.makedirs(os.path.join(self.builddir, 'images'))
         for src in self.hashed_files:
             dst = self.hashed_files[src]
             dst = os.path.join(self.builddir, dst)
-            print(f'{src}->{dst}')
+            print(f'  - {src} -> {dst}')
             if not os.path.exists(dst):
                 shutil.copyfile(src, dst)
 
