@@ -1,6 +1,7 @@
 # TODO:
 #  - Jinja style snippets (with variable substitution)
-#  - Stop output paths in files from having backslashes
+#  - Do some serious refactoring of directory management
+#  - Check if there's a better way to replace backslashes than just string replace
 #  - Cache busting for html
 import os
 import shutil
@@ -37,6 +38,9 @@ class HTMLBuilder(HTMLParser):
 
         Raises:
             Any error associated with making the file (and its directory)
+        
+        Returns:
+            Output file object.
         '''
         if not os.path.exists(os.path.dirname(self.ofilepath)):
             os.makedirs(os.path.dirname(self.ofilepath)) # let errors raise
@@ -58,6 +62,9 @@ class HTMLBuilder(HTMLParser):
             attrs_list (list): List of tuples of the form `(attr, value)`.
                 Should be the list of attributes returned by HTMLParser
                 handler methods.
+        
+        Returns:
+            string of `attr=val` pairs, for injection in HTML
         '''
         if(not attrs_list): # empty list
             return ""
@@ -104,7 +111,7 @@ class PageBuilder(HTMLBuilder):
     def __init__(self, src_dir, build_dir, build_file, file_hash, main_page):
         super().__init__(build_dir, build_file)
         self.srcdir = src_dir
-        self.imghash = file_hash
+        self.filehash = file_hash
         self.mainpg = main_page
 
     def _replace_src(self, src_file, src_dir, dest_dir):
@@ -122,30 +129,62 @@ class PageBuilder(HTMLBuilder):
         Returns:
             The path of the output file, relative to the top level build directory.
         '''
-        src_path = os.path.normpath(src_file)
-        src_path = os.path.join(src_dir, src_path)
+        src_path = os.path.normpath(src_file) # normalize path to file
+        src_path = os.path.join(src_dir, src_path) # create relative path from cwd to file
         assert os.path.exists(src_path) # make sure file exists
-        newpath = self.imghash(src_path, dest_dir)
+        newpath = self.filehash(src_path, dest_dir)
         if not self.mainpg:
             newpath = os.path.join('..', newpath)
         return newpath
     
-    def _replace_attr(self, attrs, attr_name, src_dir, dest_dir, testfunc):
+    def _replace_attr(self, attrs, attr_name, src_dir, dest_dir, test_func):
+        '''Helper function to replace an attribute in a list with a hashed version.
+
+        Checks whether the attribute value should be hashed, and if so, calls
+        self._replace_src to get the hashed value and replaces it in attrs
+
+        Args:
+            attrs (list): a list of tuples `(attr, val)` to be modified
+            attr_name (str): the specific attribute to give a hash-tagged value
+            src_dir (str): directory of source file
+            dest_dir (str): intended directory of output (hash-tagged) file
+            test_func (func): function to check if `val` should be hashed or not.
+
+        Returns:
+            Nothing, but modifies attrs
+        '''
         src_file = list(filter(lambda x: x[0] == attr_name, attrs))[0][1] # extract name of file to be hashed
-        if testfunc(src_file):
+        if test_func(src_file):
             newpath = self._replace_src(src_file, src_dir, dest_dir)
-            attrs[:] = map(lambda x: (x[0], newpath) if x[0] == attr_name else x, attrs)
+            attrs[:] = map(lambda x: (x[0], newpath.replace('\\', '/')) if x[0] == attr_name else x, attrs)
 
     # hash css files
     def handle_starttag(self, tag, attrs):
+        '''Parses start tags, and hashes the included local CSS files.
+
+        Replaces local CSS files with a hash-tagged version for cache-busting.
+        Is called automatically by HTMLParser base class when an HTML file is
+        fed with feed()
+        '''
         if tag == 'link':
-            if list(filter(lambda x: x[0] == 'rel', attrs))[0][1] == 'stylesheet':
+            rel_type = list(filter(lambda x: x[0] == 'rel', attrs))[0][1] # extract rel type of <link> tag
+            if rel_type == 'stylesheet': # if it's a stylesheet, hash it as long as it's local
                 self._replace_attr(attrs, 'href', os.path.dirname(self.ofilepath), 'css', 
                     lambda x: not x.startswith('http'))
         self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
 
     # Build handler
     def handle_startendtag(self, tag, attrs):
+        '''Parses start/end tags (`<.../>`), and performs the necessary compile steps.
+
+        Is called automatically by base class. Performs several replacements (also
+        documented in class docstring)
+            1. Parses `<Markdown src="...">` tags and replaces them with the converted
+            Markdown content from the `src` file.
+            2. Parses `<Snippet src="..." var1="..." var2="...">` tags and replaces them
+            with the converted HTML snippet files, with the variables substituted in.
+            3. Adds hashes to included image files (for cache busting).
+        '''
         if tag == 'Markdown':
             pass
         elif tag == 'Snippet':
@@ -227,7 +266,7 @@ class SiteBuilder:
         # replace images
         cssFile = cssutils.parseFile(ocsspath)
         cssutils.replaceUrls(cssFile, 
-            lambda x: os.path.join('..',self.file_hash(os.path.join('src','scss',os.path.normpath(x)), 'images')), ignoreImportRules=True)
+            lambda x: os.path.join('..',self.file_hash(os.path.join('src','scss',os.path.normpath(x)), 'images')).replace('\\', '/'), ignoreImportRules=True)
         with open(ocsspath, 'wb') as css:
             css.write(cssFile.cssText)
 
