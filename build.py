@@ -15,23 +15,50 @@ import cssutils
 cssutils.log.setLevel(logging.CRITICAL)
 
 class HTMLBuilder(HTMLParser):
+    '''Base class for HTML compilers. 
+    
+    Streams input HTML to output file, specified by parameters.
+    Use as a ContextManager (with) in order to manage file properly.
+    
+    Attributes:
+        build_dir (str): directory of output HTML file
+        build_file (str): file name of output file (with extension)
+    '''
+
     def __init__(self, build_dir, build_file):
         super().__init__(convert_charrefs=True)
         self.ofilepath = os.path.join(build_dir, build_file)
         self.ofile = None
     
     def __enter__(self):
+        '''Entry method for context manager.
+
+        Opens and returns output file.
+
+        Raises:
+            Any error associated with making the file (and its directory)
+        '''
         if not os.path.exists(os.path.dirname(self.ofilepath)):
             os.makedirs(os.path.dirname(self.ofilepath)) # let errors raise
         self.ofile = open(self.ofilepath, 'w+')
         return self
     
     def __exit__(self, *args):
+        '''Exit method for context manager.
+
+        Closes the output file.
+        '''
         self.ofile.close()
 
-    # utility
     @staticmethod
     def _build_attrs(attrs_list):
+        '''Converts the list of attributes into HTML `attribute=value` format.
+
+        Args:
+            attrs_list (list): List of tuples of the form `(attr, value)`.
+                Should be the list of attributes returned by HTMLParser
+                handler methods.
+        '''
         if(not attrs_list): # empty list
             return ""
         
@@ -56,25 +83,65 @@ class HTMLBuilder(HTMLParser):
 
 
 class PageBuilder(HTMLBuilder):
-    def __init__(self, src_dir, build_dir, build_file, img_hash, main_page):
+    '''Class to build top level HTML source pages, with Snippet and Markdown tags.
+
+    Compiles custom HTML pages into pure HTML source files to serve. In particular,
+    performs several different operations.
+        1. Parses `<Markdown src="...">` tags and replaces them with the converted
+           Markdown content from the `src` file.
+        2. Parses `<Snippet src="..." var1="..." var2="...">` tags and replaces them
+           with the converted HTML snippet files, with the variables substituted in.
+        3. Adds hashes to included CSS and image files (for cache busting)
+
+    Attributes:
+        src_dir (str): directory of input source file
+        build_dir (str): directory of output HTML file
+        build_file (str): file name of output file (with extension)
+        file_hash (func): hash function that returns name of file with hash value added
+        main_page (bool): indicates whether this is the top level index.html; TODO: Convert this to `resource_prefix` or something more general
+    '''
+
+    def __init__(self, src_dir, build_dir, build_file, file_hash, main_page):
         super().__init__(build_dir, build_file)
         self.srcdir = src_dir
-        self.imghash = img_hash
+        self.imghash = file_hash
         self.mainpg = main_page
+
+    def _replace_src(self, src_file, src_dir, dest_dir):
+        '''Helper function to hash a given source file.
+
+        Checks whether the source file exists, and then calls self.file_hash
+        on it.
+
+        Args:
+            src_file (str): name of source file
+            src_dir (str): directory of source file
+            dest_dir (str): intended directory of output (hash-tagged) file,
+                relative to top level build directory. TODO: Use os.path to get path between current self.srcdir and overall build directory to make this more general.
+        
+        Returns:
+            The path of the output file, relative to the top level build directory.
+        '''
+        src_path = os.path.normpath(src_file)
+        src_path = os.path.join(src_dir, src_path)
+        assert os.path.exists(src_path) # make sure file exists
+        newpath = self.imghash(src_path, dest_dir)
+        if not self.mainpg:
+            newpath = os.path.join('..', newpath)
+        return newpath
+    
+    def _replace_attr(self, attrs, attr_name, src_dir, dest_dir, testfunc):
+        src_file = list(filter(lambda x: x[0] == attr_name, attrs))[0][1] # extract name of file to be hashed
+        if testfunc(src_file):
+            newpath = self._replace_src(src_file, src_dir, dest_dir)
+            attrs[:] = map(lambda x: (x[0], newpath) if x[0] == attr_name else x, attrs)
 
     # hash css files
     def handle_starttag(self, tag, attrs):
         if tag == 'link':
             if list(filter(lambda x: x[0] == 'rel', attrs))[0][1] == 'stylesheet':
-                cssname = list(filter(lambda x: x[0] == 'href', attrs))[0][1] # extract path to css file
-                if not cssname.startswith('http'):
-                    csspath = os.path.normpath(cssname)
-                    csspath = os.path.join(os.path.dirname(self.ofilepath), csspath)
-                    assert os.path.exists(csspath) # make sure css file exists
-                    newpath = self.imghash(csspath, 'css')
-                    if not self.mainpg:
-                        newpath = os.path.join('..', newpath)
-                    attrs = list(map(lambda x: (x[0], newpath) if x[0] == 'href' else x, attrs))
+                self._replace_attr(attrs, 'href', os.path.dirname(self.ofilepath), 'css', 
+                    lambda x: not x.startswith('http'))
         self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
 
     # Build handler
@@ -84,14 +151,7 @@ class PageBuilder(HTMLBuilder):
         elif tag == 'Snippet':
             pass
         elif tag == 'img':
-            imgpath = list(filter(lambda x: x[0] == 'src', attrs))[0][1] # extract path to image
-            imgpath = os.path.normpath(imgpath)
-            imgpath = os.path.join(self.srcdir, imgpath)
-            assert os.path.exists(imgpath) # make sure image exists
-            newpath = self.imghash(imgpath, 'images')
-            if not self.mainpg:
-                newpath = os.path.join('..', newpath)
-            attrs = list(map(lambda x: (x[0], newpath) if x[0] == 'src' else x, attrs))
+            self._replace_attr(attrs, 'src', self.srcdir, 'images', lambda x: True)
             self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}/>')
         else:
             self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}/>')
@@ -146,7 +206,7 @@ class SiteBuilder:
         lastdot = origname.rfind('.')
         newname = f'{origname[:lastdot]}.{hasher.hexdigest()}.{origname[lastdot+1:]}'
         if save:
-            self.hashed_files[filepath] = os.path.join(destdir, newname)
+            self.hashed_files[filepath] = os.path.normpath(os.path.join(destdir, newname))
             return self.hashed_files[filepath]
         else:
             return newname
