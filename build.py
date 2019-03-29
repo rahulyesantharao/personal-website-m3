@@ -1,6 +1,7 @@
 # TODO:
-#  - Cache busting for css, html
-#  - 
+#  - Jinja style snippets (with variable substitution)
+#  - Stop output paths in files from having backslashes
+#  - Cache busting for html
 import os
 import shutil
 import functools
@@ -13,12 +14,9 @@ import sass
 import cssutils
 cssutils.log.setLevel(logging.CRITICAL)
 
-class PageBuilder(HTMLParser):
-    def __init__(self, src_dir, build_dir, build_file, img_hash, main_page):
+class HTMLBuilder(HTMLParser):
+    def __init__(self, build_dir, build_file):
         super().__init__(convert_charrefs=True)
-        self.srcdir = src_dir
-        self.imghash = img_hash
-        self.mainpg = main_page
         self.ofilepath = os.path.join(build_dir, build_file)
         self.ofile = None
     
@@ -31,7 +29,6 @@ class PageBuilder(HTMLParser):
     def __exit__(self, *args):
         self.ofile.close()
 
-
     # utility
     @staticmethod
     def _build_attrs(attrs_list):
@@ -42,6 +39,12 @@ class PageBuilder(HTMLParser):
         return " " + functools.reduce(lambda a,b: f'{a} {b}', attrs)
     
     # default handlers: in -> out
+    def handle_starttag(self, tag, attrs):
+        self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
+
+    def handle_startendtag(self, tag, attrs):
+        self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}/>')
+
     def handle_endtag(self, tag):
         self.ofile.write(f'</{tag}>')
     
@@ -51,22 +54,34 @@ class PageBuilder(HTMLParser):
     def handle_decl(self, decl):
         self.ofile.write(f'<!{decl}>')
 
+
+class PageBuilder(HTMLBuilder):
+    def __init__(self, src_dir, build_dir, build_file, img_hash, main_page):
+        super().__init__(build_dir, build_file)
+        self.srcdir = src_dir
+        self.imghash = img_hash
+        self.mainpg = main_page
+
     # hash css files
     def handle_starttag(self, tag, attrs):
         if tag == 'link':
-            csspath = list(filter(lambda x: x[0] == 'href', attrs))[0][1] # extract path to css file
-            csspath = os.path.normpath(csspath)
-            csspath = os.path.join(os.path.dirname(self.ofilepath), csspath)
-            assert os.path.exists(csspath) # make sure image exists
-            newpath = self.imghash(csspath, 'css')
-            if not self.mainpg:
-                newpath = os.path.join('..', newpath)
-            attrs = list(map(lambda x: (x[0], newpath) if x[0] == 'href' else x, attrs))
+            if list(filter(lambda x: x[0] == 'rel', attrs))[0][1] == 'stylesheet':
+                cssname = list(filter(lambda x: x[0] == 'href', attrs))[0][1] # extract path to css file
+                if not cssname.startswith('http'):
+                    csspath = os.path.normpath(cssname)
+                    csspath = os.path.join(os.path.dirname(self.ofilepath), csspath)
+                    assert os.path.exists(csspath) # make sure css file exists
+                    newpath = self.imghash(csspath, 'css')
+                    if not self.mainpg:
+                        newpath = os.path.join('..', newpath)
+                    attrs = list(map(lambda x: (x[0], newpath) if x[0] == 'href' else x, attrs))
         self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
 
-    # Markdown handler
+    # Build handler
     def handle_startendtag(self, tag, attrs):
         if tag == 'Markdown':
+            pass
+        elif tag == 'Snippet':
             pass
         elif tag == 'img':
             imgpath = list(filter(lambda x: x[0] == 'src', attrs))[0][1] # extract path to image
@@ -81,6 +96,7 @@ class PageBuilder(HTMLParser):
         else:
             self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}/>')
 
+
 # TODO: USE ffmpeg to compress images
 class SiteBuilder:
     '''
@@ -89,6 +105,7 @@ class SiteBuilder:
         favicons/ - copied directly to build
         images/ - only relevant images copied to build
         sass/ - compiled and moved to build
+        snippets/ - shared snippets of html
         *.html - compiled and moved to build
     
     Creates build structure below:
@@ -157,9 +174,10 @@ class SiteBuilder:
         # html
         html_to_build = []
         for dirpath, _, filenames in os.walk(self.srcdir):
-            for filename in filenames:
-                if filename.endswith(".html"):
-                    html_to_build.append((dirpath, filename))
+            if(dirpath.find('snippets') == -1):
+                for filename in filenames:
+                    if filename.endswith(".html"):
+                        html_to_build.append((dirpath, filename))
 
         print(html_to_build)
         for path, filename in html_to_build:
