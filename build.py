@@ -10,6 +10,7 @@ import pathlib
 from html.parser import HTMLParser
 import hashlib
 import logging
+import re
 
 import sass
 import cssutils
@@ -185,10 +186,14 @@ class PageBuilder(HTMLBuilder):
             with the converted HTML snippet files, with the variables substituted in.
             3. Adds hashes to included image files (for cache busting).
         '''
-        if tag == 'Markdown':
+        if tag == 'markdown':
             pass
-        elif tag == 'Snippet':
-            pass
+        elif tag == 'snippet':
+            attrs = dict(attrs)
+            with open(os.path.join(self.srcdir, os.path.normpath(attrs['src'])), 'r') as snippet:
+                data = snippet.read().replace('\n', '')
+            data = re.sub(r'{{ (.*?) }}', lambda x: attrs[x.group(1)], data)
+            self.ofile.write(data)
         elif tag == 'img':
             self._replace_attr(attrs, 'src', self.srcdir, 'images', lambda x: True)
             self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}/>')
