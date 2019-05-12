@@ -2,6 +2,7 @@
 #  - Jinja style snippets (with variable substitution)
 #  - Do some serious refactoring of directory management
 #  - Check if there's a better way to replace backslashes than just string replace
+#  - issue with nbsp in footer
 #  - Cache busting for html
 import os
 import shutil
@@ -171,6 +172,9 @@ class PageBuilder(HTMLBuilder):
             if rel_type == 'stylesheet': # if it's a stylesheet, hash it as long as it's local
                 self._replace_attr(attrs, 'href', os.path.dirname(self.ofilepath), 'css', 
                     lambda x: not x.startswith('http'))
+        elif tag == 'script':
+            self._replace_attr(attrs, 'src', os.path.dirname(self.ofilepath), 'scripts', 
+                lambda x: not x.startswith('http'))
         self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
 
     def handle_startendtag(self, tag, attrs):
@@ -187,6 +191,7 @@ class PageBuilder(HTMLBuilder):
         if tag == 'markdown':
             pass
         elif tag == 'snippet':
+            # TODO: Snippets are not preprocessed -> no file hashing, etc.
             attrs = dict(attrs)
             with open(os.path.join(self.srcdir, os.path.normpath(attrs['src'])), 'r') as snippet:
                 data = snippet.read()
@@ -207,6 +212,7 @@ class SiteBuilder:
         favicons/ - copied directly to build
         images/ - only relevant images copied to build
         sass/ - compiled and moved to build
+        scripts/ - copied to build
         snippets/ - shared snippets of html
         *.html - compiled and moved to build
     
@@ -218,6 +224,8 @@ class SiteBuilder:
             index.html
         css/
             main.hash.css
+        scripts/
+            main.hash.js
         images/
         
     '''
@@ -255,8 +263,9 @@ class SiteBuilder:
         
     
     def build(self):
-        assert not os.path.exists(self.builddir) # make sure it doesn't exist
-        
+        if os.path.exists(self.builddir): # make sure it doesn't exist
+            shutil.rmtree(self.builddir)
+            
         # favicons
         print('* Copying Favicons')
         shutil.copytree(f'{self.srcdir}/favicons', f'{self.builddir}/') # copy over favicons, create builddir
@@ -268,6 +277,11 @@ class SiteBuilder:
         with open(ocsspath, 'w+') as css:
             css.write(sass.compile(filename='src/scss/styles.scss'))
 
+        # copy over js
+        print('* Moving JS')
+        os.makedirs(os.path.join(self.builddir, 'scripts'))
+        shutil.copyfile(f'{self.srcdir}/scripts/main.js', f'{self.builddir}/scripts/main.js') # copy over favicons, create builddir
+        
         # replace images
         cssFile = cssutils.parseFile(ocsspath)
         cssutils.replaceUrls(cssFile, 
