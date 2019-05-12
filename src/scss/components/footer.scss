@@ -1,0 +1,24 @@
+// Styles related to the footer
+
+// Makes sure the footer stays at the bottom of the screen
+main {
+  &.home {
+    height: 100%;
+  }
+  flex: 1;
+}
+
+// Footer styling
+footer {
+  transition: color $page-transition-time ease;
+  p {
+    text-align: center;
+  }
+  padding: 1rem;
+  font-size: 1rem;
+  p a i {
+    font-size: 1.5rem !important;
+  }
+  color: $color-font;
+  font-family: $font-family-secondary;
+}

@@ -1,0 +1,61 @@
+// Home page container
+#homeDisplay {
+  height: 100%;
+  background-image:  url('../images/home.min.gif'); // 2b669b tint, using http://www167.lunapic.com/editor/
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  .banner {
+    max-width: 100%;
+    text-align: right;
+    // color: white;
+    // font-family: 'Zilla Slab', monospace;
+    padding-right: $screen-gap;
+    position: absolute;
+    right: 0;
+    @include desktop {
+      padding-right: 2 * $screen-gap;
+    }
+    h1 { // Make the header bigger than regular h1
+      font-size: 3rem;
+      line-height: 3.8rem;
+      @include tablet {
+        font-size: 5rem;
+        line-height: 6.2rem;
+      }
+      @include desktop {
+        font-size: 7rem;
+        line-height: 9rem;
+      }
+    }
+    h2 { // Make the header bigger than regular h2
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      font-size: 1rem;
+      line-height: 1.4rem;
+      @include tablet {
+        font-size: 2rem;
+        line-height: 2.7rem;
+      }
+      @include desktop {
+        font-size: 3rem;
+        line-height: 4rem;
+      }
+      // span {
+      //   background-color: black;
+      // }
+    }
+  }
+}
+
+
+section.page-title {
+  background-size: 'cover';
+  background-position: '50% 100%';
+  background-attachment: 'fixed';
+  background-repeat: 'no-repeat';
+  padding: '90px 0';
+}

@@ -1,0 +1,144 @@
+// basic site styling
+html {
+  background-color: $color-bg;
+  color: $color-font;
+  font-family: $font-family-primary;
+  line-height: $line-height-primary;
+  height: 100%;
+}
+
+body {
+  font-size: 1rem;
+  @include tablet {
+    font-size: 1.15rem;
+  }
+  height: 100%;
+}
+
+// Basic selection styles
+::selection {
+  background: $color-selection;
+  text-shadow: none;
+}
+
+// Basic link styles
+a {
+  // will-change: color;
+  transition: color $transition-time ease;
+  color: $color-link;
+  cursor: pointer;
+  &:link, &:visited {
+    color: $color-link;
+  }
+  &:hover, &:focus {
+    color: $color-link-hover;
+  }
+  &:active {
+    color: $color-link-pressed;
+  }
+  font-weight: $font-weight-bold;
+}
+
+// List styles
+ul {
+  li {
+    display: flex;
+    &:before {
+      padding-right: 0.5rem;
+      flex-grow: 0;
+      font-weight: $font-weight-bold;
+      font-family: $font-family-headings;
+      content: '\003E'; //\00BB
+    }
+  }
+}
+ol {
+  li {
+    counter-increment: step-counter;
+    display: flex;
+    &:before {
+      padding-right: 0.5rem;
+      flex-grow: 0;
+      font-weight: $font-weight-bold;
+      font-family: $font-family-headings;
+      content: counter(step-counter);
+    }
+  }
+}
+
+// Basic heading styles
+@for $index from 1 through 3 {
+  h#{$index}{
+    font-size: nth($font-size-h, $index);
+    font-family: $font-family-headings;
+    span {
+      background-color: black;
+      color: white;
+    }
+  }
+}
+h3, h4 {
+  font-weight: $font-weight-bold;
+  // padding: 0.3rem 0;
+}
+
+// Basic paragraph styles
+.text {
+  p {
+    padding: 0.5rem 0;
+    // &:first-child {
+    //   padding-top: 0;
+    // }
+  }
+  h2, h3, ol, ul {
+    padding: 0.5rem 0;
+  }
+}
+.top-pad {
+  padding-top: 1.5rem;
+  padding-bottom: 1rem;
+}
+// Responsive classes
+@include desktop {
+  .is-hidden-desktop {
+    display: none !important;
+  }
+}
+
+@include touch {
+  .is-hidden-touch {
+    display: none !important;
+  }
+}
+
+#aboutHeader {
+  background-image: url('../images/ry.png');
+}
+#courseworkHeader {
+  background-image: url('../images/ry.png');
+}
+
+.is-flex {
+  display: flex !important;
+  flex-wrap: wrap;
+  @include mobile {
+    display: block !important;
+    p {
+      text-align: center;
+    }
+  }
+}
+.top-pad-mobile {
+  @include mobile {
+    padding-top: 1.5rem !important;
+  }
+}
+.is-right {
+  @include tablet {
+    margin-left: auto;
+  }
+}
+
+.is-justified {
+  text-align: justify;
+}

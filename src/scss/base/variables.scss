@@ -1,0 +1,100 @@
+// @import url('https://fonts.googleapis.com/css?family=Roboto+Slab');
+// @import url('https://fonts.googleapis.com/css?family=Roboto');
+@import url('https://fonts.googleapis.com/css?family=Zilla+Slab');
+// @import url('https://fonts.googleapis.com/css?family=Montserrat');
+// Site Colors
+$color-primary: blue;
+$color-accent: #2b669b;
+$color-bg: white; //white;
+$color-selection: lighten(#2b669b, 50%);
+
+// Font Colors
+$color-font: #797979; //black;
+
+$color-link: lighten(#2b669b, 30%);
+$color-link-hover: darken($color-link, 30%);
+$color-link-pressed: darken($color-link, 60%);
+
+$color-nav-link: white; //black;
+// $color-nav-link-hover: $color-nav-link;
+// $color-nav-link-pressed: $color-nav-link;
+
+// Fonts
+$font-family-primary: 'Zilla Slab', sans-serif; //Lato, sans-serif;
+$font-family-secondary: 'Zilla Slab', sans-serif;
+$font-family-headings: 'Zilla Slab', monospace;
+
+$font-weight-light: 300;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+$line-height-primary: 1.5;
+
+$font-size-logo: 1.4rem;
+$font-size-h: 3rem, 2rem, 1.2rem;
+
+// Transitions
+$transition-time: 0.25s;
+$page-transition-time: 0.25s;
+$navlink-transition-time: 0.25s;
+
+// Responsive Breakpoints
+$screen-gap: 24px;
+$screen-tablet: 769px;
+$screen-desktop: 960px + (2*$screen-gap);
+$screen-widescreen: 1152px + (2*$screen-gap);
+$screen-fullhd: 1344px +  (2*$screen-gap);
+
+@mixin mobile { // mobile screens
+  @media screen and (max-width: $screen-tablet - 1px) {
+    @content;
+  }
+}
+
+@mixin tablet { // tablet and larger
+  @media screen and (min-width: $screen-tablet), print {
+    @content;
+  }
+}
+
+@mixin tablet-only { // only tablet
+  @media screen and (min-width: $screen-tablet) and (max-width: $screen-desktop - 1px) {
+    @content;
+  }
+}
+
+@mixin touch { // mobile and tablet
+  @media screen and (max-width: $screen-desktop - 1px) {
+    @content;
+  }
+}
+
+@mixin desktop { // desktop and up
+  @media screen and (min-width: $screen-desktop) {
+    @content;
+  }
+}
+
+@mixin desktop-only { // only desktop
+  @media screen and (min-width: $screen-desktop) and (max-width: $screen-widescreen - 1px) {
+    @content;
+  }
+}
+
+@mixin widescreen { // widescreen and up
+  @media screen and (min-width: $screen-widescreen) {
+    @content;
+  }
+}
+
+@mixin widescreen-only { // only widescreen
+  @media screen and (min-width: $screen-widescreen) and (max-width: $screen-fullhd - 1px) {
+    @content;
+  }
+}
+
+@mixin fullhd { // full-hd and up
+  @media screen and (min-width: $screen-fullhd) {
+    @content;
+  }
+}

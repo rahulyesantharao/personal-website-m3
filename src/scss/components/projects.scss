@@ -1,0 +1,37 @@
+.projectsPage {
+  a {
+    img {
+      // will-change: opacity;
+      transition: opacity $transition-time ease;
+    }
+    &:hover, &:focus {
+      img {
+        opacity: 0.5;
+      }
+      .project-title {
+        background-color: rgba(0,0,0,0.5);
+      }
+    }
+    &:link, &:visited, &:active {
+      color: white;
+    }
+    color: white;
+    position: relative;
+  }
+}
+.project-title {
+  // will-change: background-color;
+  font-weight: normal !important;
+  transition: background-color $transition-time ease;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  padding: 0.25rem 0.25rem;
+  background-color: black;
+  background-color: rgba(0,0,0,0.7);
+}
+
+#projectsHeader {
+  // background-image: url('../images/projects-header.min.png');
+}

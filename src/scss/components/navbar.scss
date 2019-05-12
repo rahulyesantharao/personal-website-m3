@@ -1,0 +1,287 @@
+// Link Styles: https://codepen.io/EvyatarDa/pen/waKXMd
+@mixin link-color-nav {
+  color: $color-nav-link;
+  &:link, &:visited {
+    color: $color-nav-link;
+  }
+  &:hover, &:focus {
+    color: $color-nav-link;
+  }
+  &:active, &.active {
+    color: $color-nav-link;
+  }
+}
+
+@mixin link-color-font {
+  color: $color-font;
+  &:link, &:visited {
+    color: $color-font;
+  }
+  &:hover, &:focus {
+    color: $color-font;
+  }
+  &:active, &.active {
+    color: $color-font;
+  }
+}
+
+.navbar {
+  // basic navbar styling
+  z-index: 996;
+  padding: 1rem;
+  font-weight: $font-weight-bold !important;
+  display: flex;
+  // basic navlink styling
+  a {
+    position: relative;
+    @include link-color-nav;
+    transition: color $page-transition-time ease;
+  }
+}
+
+.home {
+  .navbar-burger {
+    span {
+      background-color: $color-nav-link;
+    }
+    &:hover, &:focus {
+      span {
+        background-color: $color-nav-link;
+      }
+    }
+    // &.is-active {
+    //   span {
+    //     background-color: $color-nav-link;
+    //   }
+    // }
+  }
+  .navbar-right {
+    a{@include link-color-nav;}
+  }
+}
+
+.navbar-menu-drawer {
+  background-color: $color-accent;
+  position: fixed;
+  margin: -1rem;
+  padding: 5rem 3rem;
+  max-width: 100%;
+  height: 100%;
+  // will-change: transform;
+  transform: translateX(-120%);
+  transition: transform $transition-time ease;
+  z-index: 999;
+  .navbar-item a { // sliding line effect under menu links
+    overflow: hidden;
+    // &:after, &:before {
+    //   position: absolute;
+    //   content: "";
+    // }
+    &:before {
+      position: absolute;
+      content: "";
+      bottom: 0px;
+      left: 0px;
+      width: 100%;
+      height: 2px;
+      // will-change: transform, background-color;
+      transition: transform $navlink-transition-time ease;//, background-color $navlink-transition-time ease;
+      transform: translateX(-110%);
+      background-color: $color-nav-link;
+    }
+    &:focus:before, &:hover:before, &.active:before {
+      transform: translateX(0px);
+      // background-color: $color-nav-link;
+    }
+  }
+}
+
+.navbar-item { // give navbar links room around them without creating linked area
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  align-items: center;
+  font-family: $font-family-secondary;
+}
+
+.navbar-left {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  // max-width: 100vw;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  #logo {
+    font-size: $font-size-logo;
+    font-family: $font-family-headings;
+    span {
+      color: white;
+      background-color: black;
+    }
+  }
+}
+
+// navbar burger variables
+$line-height: 2px;
+$line-between: 2;
+$line-length: 20px;
+
+.navbar-burger {
+  z-index: 1000;
+  flex-shrink: 0; // make sure it isn't lost on ultra small screens
+  cursor: pointer;
+  display: block;
+  position: relative;
+  height: (3+2*$line-between)*$line-height;
+  width: $line-length;
+  span {
+    background-color: $color-font;
+    display: block;
+    height: $line-height;
+    position: absolute;
+    left: 0;
+    border-radius: $line-height;
+    opacity: 1;
+    width: 100%;
+    transform: rotate(0deg);
+    &:nth-child(1) {
+      // will-change: background-color, top, transform;
+      transition: background-color $page-transition-time ease-in-out, top $transition-time ease-in-out, transform $transition-time ease-in-out;
+      top: 0px;
+    }
+    &:nth-child(2) {
+      // will-change: background-color, opacity, left;
+      transition: background-color $page-transition-time ease-in-out, opacity $transition-time ease-in-out, left $transition-time ease-in-out;
+      top: (1+$line-between)*$line-height;
+    }
+    &:nth-child(3) {
+      // will-change: background-color, top, transform;
+      transition: background-color $page-transition-time ease-in-out, top $transition-time ease-in-out, transform $transition-time ease-in-out;
+      top: (2+2*$line-between)*$line-height;
+    }
+  }
+  &:hover, &:focus {
+    span {
+      background-color: $color-font;
+    }
+  }
+  // When clicked
+  &.is-active {
+    span {
+      background-color: $color-nav-link;
+      &:nth-child(1) {
+        top: 2*$line-height;
+        transform: rotate(135deg);
+      }
+      &:nth-child(2) {
+        opacity: 0;
+        left: -1*$line-length;
+      }
+      &:nth-child(3) {
+        top: 2*$line-height;
+        transform: rotate(-135deg);
+      }
+    }
+  }
+}
+
+.navbar-right {
+  display: flex;
+  font-size: 2rem;
+  // align-items: center;
+  a {@include link-color-font;}
+}
+
+.navbar-menu-desktop {
+  // mobile-first: menu starts hidden
+  display: none;
+}
+
+#sidenav-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background-color: transparent;
+  background-color: rgba(0,0,0,0.5);
+  z-index: -1;
+  will-change: opacity, z-index;
+  transition: opacity $transition-time ease, z-index $transition-time step-end;
+  opacity: 0;
+}
+
+// responsiveness
+@include touch {
+  .navbar-menu-drawer {
+    &.is-active {
+      transform: translateX(0px);
+    }
+  }
+  #sidenav-overlay {
+    &.is-active {
+      opacity: 1;
+      z-index: 995;
+      transition: opacity $transition-time ease, z-index $transition-time step-start;
+    }
+  }
+}
+
+@include desktop {
+  .navbar:not(.home) {
+    .navbar-menu-desktop, .navbar-menu-drawer {
+      .navbar-item a {
+        &:before {
+          background-color: $color-font;
+        }
+        &:focus:before, &:hover:before, &.active:before {
+          transform: translateX(0px);
+          background-color: $color-font;
+        }
+      }
+    }
+    a {
+      @include link-color-font;
+    }
+  }
+  .navbar-menu-desktop {
+    display: flex;
+    flex-grow: 1;
+    flex-shrink: 0;
+    justify-content: flex-start;
+    margin-right: auto;
+    margin-left: 0.75rem;
+    .navbar-item a { // sliding line effect under menu links
+      overflow: hidden;
+      // &:after, &:before {
+      //   position: absolute;
+      //   content: "";
+      // }
+      &:before {
+        position: absolute;
+        content: "";
+        // will-change: transform, background-color;
+        transition: transform $navlink-transition-time ease, background-color $page-transition-time ease;
+        bottom: 0px;
+        left: 0px;
+        width: 100%;
+        height: 2px;
+        transform: translateX(-110%);
+        background-color: $color-nav-link;
+      }
+      &:focus:before, &:hover:before, &.active:before {
+        transform: translateX(0px);
+        // background-color: $color-nav-link;
+      }
+    }
+  }
+  .navbar-left {
+    #logo {
+      border-right: 2px solid black;
+      border-right: 2px solid rgba(black, 0.1);
+      padding-right: 1.5rem;
+    }
+    flex:  initial;
+  }
+}
