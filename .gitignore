@@ -1,4 +1,7 @@
 .sass-cache/
 *.css.map
 venv/
+uenv/
 build
+.vscode
+node_modules/
