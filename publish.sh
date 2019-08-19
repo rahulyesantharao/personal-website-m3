@@ -1,3 +1,8 @@
+if [ $# -ne 1 ]; then # check number of inputs
+  echo "usage: publish.sh <commit message>"
+  exit 1
+fi
+
 python build.py
 sed -i 's/build//' .gitignore
 git add build && git commit -m "Build $1"
