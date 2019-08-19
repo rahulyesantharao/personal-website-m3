@@ -12,17 +12,29 @@ from html.parser import HTMLParser
 import hashlib
 import logging
 import re
+import json
+from datetime import date
+import urllib
 
 import sass
 import cssutils
+import markdown
 cssutils.log.setLevel(logging.CRITICAL)
 
+def slugify(x):
+    slug = x
+    slug = re.compile('[^\s\w_]+').sub('', slug) # remove non alphanumeric
+    slug = re.compile('\s+').sub('-', slug) # whitespace to dash
+    slug = slug.lower() # lowercase
+    slug = urllib.parse.quote(slug) # quote anything remaining
+    return slug
+
 class HTMLBuilder(HTMLParser):
-    '''Base class for HTML compilers. 
-    
+    '''Base class for HTML compilers.
+
     Streams input HTML to output file, specified by parameters.
     Use as a ContextManager (with) in order to manage file properly.
-    
+
     Attributes:
         build_dir (str): directory of output HTML file
         build_file (str): file name of output file (with extension)
@@ -32,7 +44,7 @@ class HTMLBuilder(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.ofilepath = os.path.join(build_dir, build_file)
         self.ofile = None
-    
+
     def __enter__(self):
         '''Entry method for context manager.
 
@@ -40,15 +52,15 @@ class HTMLBuilder(HTMLParser):
 
         Raises:
             Any error associated with making the file (and its directory)
-        
+
         Returns:
             Output file object.
         '''
         if not os.path.exists(os.path.dirname(self.ofilepath)):
             os.makedirs(os.path.dirname(self.ofilepath)) # let errors raise
-        self.ofile = open(self.ofilepath, 'w+')
+        self.ofile = open(self.ofilepath, 'a+', buffering=1)
         return self
-    
+
     def __exit__(self, *args):
         '''Exit method for context manager.
 
@@ -64,16 +76,16 @@ class HTMLBuilder(HTMLParser):
             attrs_list (list): List of tuples of the form `(attr, value)`.
                 Should be the list of attributes returned by HTMLParser
                 handler methods.
-        
+
         Returns:
             string of `attr=val` pairs, for injection in HTML
         '''
         if(not attrs_list): # empty list
             return ""
-        
+
         attrs = map(lambda a: a[0] if a[1] is None else f'{a[0]}="{a[1]}"', attrs_list)
         return " " + functools.reduce(lambda a,b: f'{a} {b}', attrs)
-    
+
     # default handlers: in -> out
     def handle_starttag(self, tag, attrs):
         self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
@@ -83,7 +95,7 @@ class HTMLBuilder(HTMLParser):
 
     def handle_endtag(self, tag):
         self.ofile.write(f'</{tag}>')
-    
+
     def handle_data(self, data):
         self.ofile.write(data)
 
@@ -107,14 +119,34 @@ class PageBuilder(HTMLBuilder):
         build_dir (str): directory of output HTML file
         build_file (str): file name of output file (with extension)
         file_hash (func): hash function that returns name of file with hash value added
-        main_page (bool): indicates whether this is the top level index.html; TODO: Convert this to `resource_prefix` or something more general
+        top_prefix (str): prefix of the file from the top build folder
+            TODO: Convert this to `resource_prefix` or something more general
+        var (dict): dictionary of variables to substitute into the raw page data
     '''
 
-    def __init__(self, src_dir, build_dir, build_file, file_hash, main_page):
+    def __init__(self, src_dir, build_dir, build_file, file_hash, top_prefix, var):
         super().__init__(build_dir, build_file)
         self.srcdir = src_dir
+        self.builddir = build_dir
+        self.buildfile = build_file
         self.filehash = file_hash
-        self.mainpg = main_page
+        self.topprefix = top_prefix
+        self.var = var
+        datafile = os.path.join(self.srcdir, 'data.json')
+        if(os.path.exists(datafile)):
+            with open(datafile, 'r') as f:
+                self.var['data'] = json.load(f)
+
+    def feed(self, data):
+        def f(x):
+            #print(x.group(1))
+            return eval(x.group(1), {'slugify': slugify, 'date': date, 'quote': urllib.parse.quote}, self.var)
+        try:
+            data = re.sub(r'{{ (.*?) }}', f, data, flags=re.DOTALL)
+        except Exception as e:
+            print("***** ERROR *****")
+            print(e)
+        super().feed(data)
 
     def _replace_src(self, src_file, src_dir, dest_dir):
         '''Helper function to hash a given source file.
@@ -125,20 +157,22 @@ class PageBuilder(HTMLBuilder):
         Args:
             src_file (str): name of source file
             src_dir (str): directory of source file
-            dest_dir (str): intended directory of output (hash-tagged) file,
-                relative to top level build directory. TODO: Use os.path to get path between current self.srcdir and overall build directory to make this more general.
-        
+            dest_dir (str): intended directory of output (hash-tagged) file, relative to top level
+                build directory.
+                TODO: Use os.path to get path between current self.srcdir and overall build
+                      directory to make this more general.
+
         Returns:
             The path of the output file, relative to the top level build directory.
         '''
         src_path = os.path.normpath(src_file) # normalize path to file
         src_path = os.path.join(src_dir, src_path) # create relative path from cwd to file
+        #print(src_path)
         assert os.path.exists(src_path) # make sure file exists
         newpath = self.filehash(src_path, dest_dir)
-        if not self.mainpg:
-            newpath = os.path.join('..', newpath)
+        newpath = os.path.join(self.topprefix, newpath)
         return newpath
-    
+
     def _replace_attr(self, attrs, attr_name, src_dir, dest_dir, test_func):
         '''Helper function to replace an attribute in a list with a hashed version.
 
@@ -170,10 +204,10 @@ class PageBuilder(HTMLBuilder):
         if tag == 'link':
             rel_type = list(filter(lambda x: x[0] == 'rel', attrs))[0][1] # extract rel type of <link> tag
             if rel_type == 'stylesheet': # if it's a stylesheet, hash it as long as it's local
-                self._replace_attr(attrs, 'href', os.path.dirname(self.ofilepath), 'css', 
+                self._replace_attr(attrs, 'href', os.path.dirname(self.ofilepath), 'css',
                     lambda x: not x.startswith('http'))
         elif tag == 'script':
-            self._replace_attr(attrs, 'src', os.path.dirname(self.ofilepath), 'scripts', 
+            self._replace_attr(attrs, 'src', os.path.dirname(self.ofilepath), 'scripts',
                 lambda x: not x.startswith('http'))
         self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}>')
 
@@ -188,21 +222,26 @@ class PageBuilder(HTMLBuilder):
             with the converted HTML snippet files, with the variables substituted in.
             3. Adds hashes to included image files (for cache busting).
         '''
+        # TODO: Make this cleanly recursive for tag expansion
         if tag == 'markdown':
-            pass
+            attrs = dict(attrs)
+            with open(os.path.join(self.srcdir, os.path.normpath(attrs['src'])), mode='r', encoding='utf-8') as f:
+                data = f.read()
+            with PageBuilder(self.srcdir, self.builddir, self.buildfile, self.filehash, self.topprefix, attrs) as pb:
+                pb.feed(markdown.markdown(data, extensions=['codehilite'], extension_configs={'codehilite':{'linenums':True}}))
+            #self.ofile.write(markdown.markdown(data))
         elif tag == 'snippet':
-            # TODO: Snippets are not preprocessed -> no file hashing, etc.
             attrs = dict(attrs)
             with open(os.path.join(self.srcdir, os.path.normpath(attrs['src'])), 'r') as snippet:
                 data = snippet.read()
-            data = re.sub(r'{{ (.*?) }}', lambda x: attrs[x.group(1)], data)
-            self.ofile.write(data)
+            #data = re.sub(r'{{ (.*?) }}', lambda x: attrs[x.group(1)], data)
+            with PageBuilder(self.srcdir, self.builddir, self.buildfile, self.filehash, self.topprefix, attrs) as pb:
+                pb.feed(data)
         elif tag == 'img':
-            self._replace_attr(attrs, 'src', self.srcdir, 'images', lambda x: True)
+            self._replace_attr(attrs, 'src', self.srcdir, 'images', lambda x: not x.startswith('http'))
             self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}/>')
         else:
             self.ofile.write(f'<{tag}{PageBuilder._build_attrs(attrs)}/>')
-
 
 # TODO: USE ffmpeg to compress images
 class SiteBuilder:
@@ -215,7 +254,7 @@ class SiteBuilder:
         scripts/ - copied to build
         snippets/ - shared snippets of html
         *.html - compiled and moved to build
-    
+
     Creates build structure below:
     build/
         favicons/* (in main directory)
@@ -227,15 +266,15 @@ class SiteBuilder:
         scripts/
             main.hash.js
         images/
-        
+
     '''
-    
+
     def __init__(self, src_base, build_base):
         super().__init__()
         self.srcdir = src_base
         self.builddir = build_base
         self.hashed_files = {}
-    
+
     def file_hash(self, filepath, destdir, *, save=True):
         # TODO: use os.path.samefile to check for equality; shouldn't need this with abspath (below)
         if filepath.startswith('http'): # TODO: hack for checking for web urls
@@ -260,12 +299,11 @@ class SiteBuilder:
             return self.hashed_files[filepath]
         else:
             return newname
-        
-    
+
     def build(self):
         if os.path.exists(self.builddir): # make sure it doesn't exist
             shutil.rmtree(self.builddir)
-            
+
         # favicons
         print('* Copying Favicons')
         shutil.copytree(f'{self.srcdir}/favicons', f'{self.builddir}/') # copy over favicons, create builddir
@@ -281,11 +319,11 @@ class SiteBuilder:
         print('* Moving JS')
         os.makedirs(os.path.join(self.builddir, 'scripts'))
         shutil.copyfile(f'{self.srcdir}/scripts/main.js', f'{self.builddir}/scripts/main.js') # copy over favicons, create builddir
-        
+
         # replace images
         cssFile = cssutils.parseFile(ocsspath)
-        cssutils.replaceUrls(cssFile, 
-            lambda x: os.path.join('..',self.file_hash(os.path.join('src','scss',os.path.normpath(x)), 'images')).replace('\\', '/'), 
+        cssutils.replaceUrls(cssFile,
+            lambda x: os.path.join('..',self.file_hash(os.path.join('src','scss',os.path.normpath(x)), 'images')).replace('\\', '/'),
             ignoreImportRules=True)
         with open(ocsspath, 'wb') as css:
             css.write(cssFile.cssText)
@@ -296,7 +334,7 @@ class SiteBuilder:
         for dirpath, _, filenames in os.walk(self.srcdir):
             if(dirpath.find('snippets') == -1):
                 for filename in filenames:
-                    if filename.endswith(".html"):
+                    if filename == 'index.html':
                         html_to_build.append((dirpath, filename))
 
         for path, filename in html_to_build:
@@ -309,24 +347,72 @@ class SiteBuilder:
             main_page = os.path.samefile(self.srcdir, path)
             print(f'  - build_base: {build_base}')
             print(f'  - main_page: {main_page}\n')
-            with PageBuilder(src_dir, build_base, build_file, self.file_hash, main_page) as pb:
+            with PageBuilder(src_dir, build_base, build_file, self.file_hash, "" if main_page else "..", {}) as pb:
                 with open(os.path.join(path, filename)) as f:
                     data = f.read()
                 pb.feed(data)
 
+        # blog/projects
+        for page, subpage, prefix in [('blog', 'posts', '../../..')]:
+            pagedir = os.path.join(self.srcdir, page)
+            if os.path.exists(pagedir):
+              with open(os.path.join(pagedir, 'data.json'), 'r') as f:
+                posts = json.load(f)
+              for i, post in enumerate(posts):
+                # convert dates to [date] object
+                for key in ["post_date", "update_date"]:
+                  if key in post:
+                    post[key] = date(*([int(x) for x in post[key].split('-')]))
+                    post[key] = post[key].strftime("%B %d, %Y")
+                  else:
+                    post[key] = None
+                # create slug
+                if 'url' not in post:
+                  post['url'] = slugify(post['title'])
+                # author
+                post['author'] = 'Rahul Yesantharao'
+                post['num'] = i+1
+
+            #print("* POST DATA *")
+            #print(posts)
+            #print()
+            postdest = os.path.join(os.path.join(self.builddir, page), subpage)
+            if not os.path.exists(postdest):
+                os.mkdir(postdest)
+            for i in range(len(posts)):
+                postdir = os.path.join(postdest, posts[i]['url'])
+                os.mkdir(postdir)
+                with PageBuilder(pagedir, postdir, 'index.html', self.file_hash, prefix, posts[i]) as pb:
+                    with open(os.path.join(pagedir, 'post.html'), 'r') as f:
+                        data = f.read()
+                        pb.feed(data)
+
         # images and css (hashed files)
+        cssfiles = []
+        jsfiles = []
         print('* Moving hashed files')
         os.makedirs(os.path.join(self.builddir, 'images'))
         for src in self.hashed_files:
             dst = self.hashed_files[src]
             dst = os.path.join(self.builddir, dst)
+            if(dst.endswith('.js')):
+                jsfiles.append(dst)
+            if(dst.endswith('.css')):
+                cssfiles.append(dst)
             print(f'  - {src} -> {dst}')
             if not os.path.exists(dst):
                 shutil.copyfile(src, dst)
 
         # delete unhashed css file
         os.remove(os.path.join(self.builddir, 'css', 'main.css'))
+        os.remove(os.path.join(self.builddir, 'scripts', 'main.js'))
+        shutil.rmtree(os.path.join(self.builddir, 'projects'))
 
+        # postprocess
+        print('* Postprocessing!')
+        print(cssfiles)
+        print(jsfiles)
+        os.system(f"bash postprocess.sh {cssfiles[0]} {jsfiles[0]}")
 
 if __name__ == '__main__':
     sb = SiteBuilder('src', 'build')
