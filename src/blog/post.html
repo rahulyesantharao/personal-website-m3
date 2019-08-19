@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <snippet src="../snippets/meta.html"/>
+    <!-- Misc. -->
+    <link rel="stylesheet" type="text/css" href="../../../css/main.css">
+    <title>{{ title }} | Blog | Rahul Yesantharao</title>
+  </head>
+  <body>
+    <header>
+      <snippet src="../snippets/nav.html"
+               top_class=""
+               style=""
+               about_class=""
+               courses_class=""
+               projects_class=""
+               blog_class="active"/>
+    </header>
+    <snippet src="../snippets/title.html"
+        title="/usr/etc/rahul/*"
+        title_id="blogHeader"/>
+    <section class="container top-pad">
+      <div class="columns is-centered">
+        <div class="column is-12-mobile is-8-tablet is-8-desktop">
+          <h2 style="margin-top: 0.6rem; font-size: 4rem;">
+            <span>{{ title }}</span>
+          </h2>
+          <h3 style="font-size: 1rem; color: rgb(43, 102, 155)">{{ post_date }}{{ "" if update_date is None else f" | Updated: {update_date}" }}</h3>
+          <div class="blog-post text">
+            <markdown src="{{ f'post{num}.md' }}"/>
+          </div>
+        </div>
+        <div class="column is-12-mobile is-8-tablet is-8-desktop is-flex text">
+          <p class="top-pad-mobile">
+            <b>{{ author }}</b>
+            <br>
+            <span style="font-size: 1rem;">
+              Student, Programmer, Artist.
+              <br>
+              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              &nbsp;
+              Cambridge, MA
+            </span>
+          </p>
+          <p class="is-right">
+            <b>Share this post</b>
+            <br/>
+            <span style="font-size: 1rem;">
+              <a target="_blank" rel="noopener" href={{ f"https://twitter.com/intent/tweet?url=https://rahulyesantharao.com/blog/posts/{url}&text={quote(title)}" }}>
+                <i class="fa fa-twitter" aria-hidden="true"></i>
+              </a>
+              &nbsp;
+              <a target="_blank" rel="noopener" href={{ f"https://facebook.com/sharer/sharer.php?u=https://rahulyesantharao.com/blog/posts/{url}" }}>
+                <i class="fa fa-facebook" aria-hidden="true"></i>
+              </a>
+              &nbsp;
+              <a target="_blank" rel="noopener" href={{ f"http://www.linkedin.com/shareArticle?mini=true&url=https://rahulyesantharao.com/blog/posts/{url}&title={quote(title)}&summary={quote(description)}&source=rahulyesantharao.com" }}>
+                <i class="fa fa-linkedin" aria-hidden="true"></i>
+              </a>
+            </span>
+          </p>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column is-12-mobile is-8-tablet is-8-desktop is-flex text">
+          <p>
+            <a href="/blog/">← Back To Blog</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <snippet src="../snippets/footer.html"
+        style=""/>
+    <script type="text/javascript" src="../../../scripts/main.js"></script>
+  </body>
+</html>

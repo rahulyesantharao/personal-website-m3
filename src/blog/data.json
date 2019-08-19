@@ -1,0 +1,31 @@
+[
+  {
+    "title":"Hello, World!",
+    "post_date": "2017-12-26",
+    "description": "My first blog post on the WWW."
+  },
+  {
+    "title": "MIT Splash 2017!",
+    "post_date": "2018-02-21",
+    "update_date": "2018-11-19",
+    "description": "My thoughts on teaching a class for MIT Splash 2017. Also, the actual class, a quick primer on React, a front-end JS framework." 
+  },
+  {
+    "title":"Web Development, Part 1: The Front End",
+    "post_date": "2018-04-28",
+    "update_date": "2018-07-20",
+    "description": "My development process for the front end of the website you're currently on!"
+  },
+  {
+    "title":"Dual Booting Windows 10 and Arch Linux",
+    "post_date": "2018-07-17",
+    "update_date": "2018-11-12",
+    "description": "How to dual boot Arch Linux onto a Razer Blade 14\" 2017 (but also most other Windows 10 machines)."
+  },
+  {
+    "title":"Compression: A Deep Dive Into Gzip",
+    "post_date": "2018-11-17",
+    "update_date": "2018-11-19",
+    "description": "A detailed overview of the DEFLATE algorithm used by gzip for text file compression, including a full reimplementation of an unzip utility."
+  }
+]

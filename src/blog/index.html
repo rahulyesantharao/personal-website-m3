@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <snippet src="../snippets/meta.html"/>
+        <!-- Misc. -->
+        <link rel="stylesheet" type="text/css" href="../css/main.css">
+        <title>Blog | Rahul Yesantharao</title>
+    </head>
+    <body>
+        <header>
+            <snippet src="../snippets/nav.html"
+                top_class=""
+                style=""
+                about_class=""
+                courses_class=""
+                projects_class=""
+                blog_class="active"/>
+        </header>
+        <!-- About section -->
+        <snippet src="../snippets/title.html"
+            title="Blog"
+            title_id="blogHeader"/>
+        <section class="container top-pad">
+            <div class="columns is-centered">
+{{ 
+'\n'.join(reversed([
+f'''<snippet src="../snippets/post_list.html"
+    title="{post['title']}"
+    url="{slugify(post['title'])}"
+    num="{num}"
+    description="{post['description']}"
+    post_date="{date(*(int(x) for x in post['post_date'].split('-'))).strftime('%B %d, %Y')}"/>'''
+for num, post in enumerate(data)]))
+ }}
+            </div>
+        </section>
+        <!-- Footer -->
+        <snippet src="../snippets/footer.html"
+            style=""/>
+        <script type="text/javascript" src="../scripts/main.js"></script>
+    </body>
+</html>

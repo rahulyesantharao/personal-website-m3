@@ -1,0 +1,6 @@
+<div class={{ f"column is-6-mobile is-4-tablet is-2-desktop {'is-offset-2-tablet' if ((num-1)%2 == 0) else ''} {'is-offset-2-desktop' if ((num-1)%4==0) else '' }" }}>
+  <a href={{ f"/projects/{url}" }}>
+    <img src={{ f"/images/{url}.min.jpg" }}>
+    <div class="project-title">{{ title }}</div>
+  </a>
+</div>

@@ -112,10 +112,24 @@ h3, h4 {
 }
 
 #aboutHeader {
-  background-image: url('../images/ry.png');
+  background-image: url('../images/about-lake1.min.jpg');
 }
 #courseworkHeader {
-  background-image: url('../images/ry.png');
+  background-image: url('../images/coursework.min.jpg');
+}
+#blogHeader {
+  background-image: url('../images/blog.min.jpg');
+}
+#projectsHeader {
+  background-image: url('../images/projects.min.png');
+}
+
+.codehilitetable {
+  display: block !important;
+  overflow: auto;
+  .linenos {
+    padding-right: 10px;
+  }
 }
 
 .is-flex {
