@@ -1,5 +1,6 @@
 .sass-cache/
 *.css.map
+*.swp
 venv/
 uenv/
 build
