@@ -17,3 +17,4 @@ TODO:
  - [ ] open markdown links in new tab - custom extension
  - [ ] facebook, twitter meta tags
  - [ ] site analytics
+ - [ ] site cover for mobile drawer (darken website)
