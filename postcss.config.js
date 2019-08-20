@@ -11,7 +11,8 @@ module.exports = {
         '.navbar-burger.is-active span',
         '.navbar-burger.is-active span:first-child',
         '.navbar-burger.is-active span:nth-child(2)',
-        '.navbar-burger.is-active span:nth-child(3)']
+        '.navbar-burger.is-active span:nth-child(3)',
+        '#sidenav-overlay.is-active']
     })
   ],
 };

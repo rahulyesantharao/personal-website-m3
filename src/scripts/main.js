@@ -16,4 +16,5 @@ function toggleClass(element_id, class_name) {
 function toggleMenu() {
     toggleClass("navbar-menu-drawer", "is-active");
     toggleClass("navbar-burger", "is-active");
+    toggleClass("sidenav-overlay", "is-active");
 }
