@@ -145,7 +145,12 @@ class PageBuilder(HTMLBuilder):
             # print(x.group(1))
             return eval(
                 x.group(1),
-                {"slugify": slugify, "date": date, "quote": urllib.parse.quote},
+                {
+                    "slugify": slugify,
+                    "date": date,
+                    "quote": urllib.parse.quote,
+                    "base_url": "https://rahulvgy.com",
+                },
                 self.var,
             )
 
@@ -178,6 +183,8 @@ class PageBuilder(HTMLBuilder):
             src_dir, src_path
         )  # create relative path from cwd to file
         # print(src_path)
+        # print(f"src_dir: {self.srcdir}")
+        # print(f"build_dir: {self.builddir}")
         assert os.path.exists(src_path)  # make sure file exists
         newpath = self.filehash(src_path, dest_dir)
         newpath = os.path.join(self.topprefix, newpath)
@@ -199,17 +206,20 @@ class PageBuilder(HTMLBuilder):
         Returns:
             Nothing, but modifies attrs
         """
-        src_file = list(filter(lambda x: x[0] == attr_name, attrs))[0][
-            1
-        ]  # extract name of file to be hashed
-        if test_func(src_file):
-            newpath = self._replace_src(src_file, src_dir, dest_dir)
-            attrs[:] = map(
-                lambda x: (x[0], newpath.replace("\\", "/"))
-                if x[0] == attr_name
-                else x,
-                attrs,
-            )
+        # extract name of file to be hashed
+        try:
+            src_file = list(filter(lambda x: x[0] == attr_name, attrs))[0][1]
+        except:
+            pass
+        else:
+            if test_func(src_file):
+                newpath = self._replace_src(src_file, src_dir, dest_dir)
+                attrs[:] = map(
+                    lambda x: (x[0], newpath.replace("\\", "/"))
+                    if x[0] == attr_name
+                    else x,
+                    attrs,
+                )
 
     def handle_starttag(self, tag, attrs):
         """Parses start tags, and hashes the included local CSS files.
@@ -279,7 +289,16 @@ class PageBuilder(HTMLBuilder):
                 )
             # self.ofile.write(markdown.markdown(data))
         elif tag == "snippet":
+            self._replace_attr(
+                attrs,
+                "fb_img",
+                self.srcdir,
+                "images",
+                lambda x: not x.startswith("http"),
+            )
             attrs = dict(attrs)
+            if "fb_img" in attrs:
+                attrs["fb_img"] = os.path.basename(attrs["fb_img"])
             with open(
                 os.path.join(self.srcdir, os.path.normpath(attrs["src"])), "r"
             ) as snippet:

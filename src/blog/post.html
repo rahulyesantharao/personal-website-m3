@@ -3,7 +3,12 @@
   <head>
     <snippet src="../snippets/meta.html"
       prefix="../../.."
-      title="{{ f'{title} | Blog | Rahul Yesantharao' }}"/>
+      title="{{ f'{title} | Blog | Rahul Yesantharao' }}"
+      url="{{ f'/blog/posts/{url}' }}"
+      fb_type="article"
+      fb_title="{{ title }}"
+      fb_desc="{{ description }}"
+      fb_img="../images/ry.png" />
   </head>
   <body>
     <header>
