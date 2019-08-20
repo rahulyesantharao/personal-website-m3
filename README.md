@@ -12,9 +12,9 @@ Run `python build.py` to build the site from `src/` to `build/`. Use `publish.sh
 TODO:
  - [ ] run benchmarks to compare old and new sites
  - [ ] write a blog post about it
- - [ ] figure out how to get the publish script working with CNAME file
+ - [x] figure out how to get the publish script working with CNAME file
  - [ ] index.html cache busting
  - [ ] open markdown links in new tab - custom extension
- - [ ] facebook, twitter meta tags
- - [ ] site analytics
- - [ ] site cover for mobile drawer (darken website)
+ - [x] facebook, twitter meta tags
+ - [ ] site analytics - fb, twitter, google
+ - [x] site cover for mobile drawer (darken website)
