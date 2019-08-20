@@ -6,7 +6,7 @@ fi
 python build.py
 sed -i 's/build//' .gitignore
 echo "rahulvgy.com" > build/CNAME
-git add build && git commit -m "Build $1"
+git add build && git commit -m "$1"
 git push origin `git subtree split --prefix build master`:gh-pages --force
 #git subtree push --prefix build origin gh-pages
 git checkout -- .gitignore
