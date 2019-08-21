@@ -149,7 +149,7 @@ class PageBuilder(HTMLBuilder):
                     "slugify": slugify,
                     "date": date,
                     "quote": urllib.parse.quote,
-                    "base_url": "https://rahulvgy.com",
+                    "base_url": "https://rahulyesantharao.com",
                 },
                 self.var,
             )
