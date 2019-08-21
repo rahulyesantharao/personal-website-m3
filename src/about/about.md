@@ -1,6 +1,6 @@
-Hi! I’m Rahul. I'm a junior at the Massachusetts Institute of Technology, studying Course 6-2 (Electrical Engineering and Computer Science). Check out my coursework [here]("/courses")! I am passionate about anything and everything relating to technology.
+Hi! I’m Rahul. I'm a junior at the Massachusetts Institute of Technology, studying Course 6-2 (Electrical Engineering and Computer Science). Check out my coursework [here](/courses)! I am passionate about anything and everything relating to technology.
 
-In my free time, I like to work on personal projects and write about them on my [blog]("/blog"). In the past, I have directed DevOps for [HackMIT](https://hackmit.org) and helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter.
+In my free time, I like to work on personal projects and write about them on my [blog](/blog). In the past, I have directed DevOps for [HackMIT](https://hackmit.org) and helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter.
 
 I am currently doing research with Professor Tim Kraska in the Data System and AI Lab, working on [Tuplex](http://tuplex.cs.brown.edu/). In the summer of 2018, I worked as a software engineering intern on the infrastructure team at [Quora](https://www.quora.com). This past summer, I worked as a software engineering intern on the marketdata and tools/compilers teams at [Jane Street Capital](https://www.janestreet.com).
 
