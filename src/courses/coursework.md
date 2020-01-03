@@ -1,3 +1,8 @@
+### Fall 2019
+ - 6.172 - Performance Engineering of Software Systems
+ - 6.301 - Solid-State Circuits
+ - 6.111 - Introductory Digital Systems Laboratory (FPGA Lab)
+ - 21m.301 - Harmony and Counterpoint I
 ### Spring 2019
  - 6.011 - Signals, Systems, and Inference
  - 6.012 - Nanoelectronics and Computing Systems
