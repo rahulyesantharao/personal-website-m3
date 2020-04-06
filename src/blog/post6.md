@@ -1,18 +1,16 @@
-### Static Website Rebuild
-Goals - completely static, save on hosting charges + remove as much JS as possible
+This past semester, I took [http://student.mit.edu/catalog/search.cgi?search=6.301](6.301), a Solid-State Circuits course that focuses on transistors and their practical applications through labs.
 
-### Build Process (build.py)
-React has alot of pros in terms of reusability - I didn't want to lose that
-I could use Jinja, but Markdown is not natively supported, and I kind of just wanted to do it myself
+In this first post, I want to cover some of the fundamental single-transistor amplifiers that act as building blocks for all larger transistor-based designs.
 
-The several optimizations
- - snippets
- - cache busting
- - recursive snippet insertion
- - python in HTML
+## Single Transistor Amplifiers
+Each of these three topologies has its own pros and cons, and we will cover these in detail below. They are each named "Common-*X* Amplifier". This name indicates that the *X* terminal of the transistor is common to both the input and output ends of the transistor. In practical terms, this generally means that it is shorted to the ground reference that the input and output are measured against. I will demonstrate all of the topologies with an NPN BJT, but it is good to note that any of these topologies can equivalently be used with PNP or MOSFET transistors, with similar properties.
+
+### Common-Emitter Amplifier
+In this first amplifier topology, the emitter is grounded, the input signal is applied to the base, and the output is measured at the collector.
+
+![Common-Emitter Amplifier](assets/6/CommonEmitter.svg "Common-Emitter Amplifier")
+
+We will use the hybrid-pi model of the BJT to do a small signal analysis of this amplifier.
 
 
-### Speed Comparison
-Initial page load much better; still a lot I could do on the audit front, but it is faster
-we have to tradeoff with the slower loads in between, but the static routing is nice
 

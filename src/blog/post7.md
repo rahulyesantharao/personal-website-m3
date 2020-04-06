@@ -1,36 +1,3 @@
-### The Back End
-### Domain Registration
-I use GoDaddy for my domain registrar 
-DNS Explanation/link
+This past semester, I took [http://student.mit.edu/catalog/search.cgi?search=6.301](6.301), a Solid-State Circuits course that focuses on transistors and their practical applications through labs. 
 
-```
-this is a test of code
-mor code
-yes code
-code code code
-g
-g
-g
-g
-g
-g
-g
-g
-```
-
-### Hosting
-DigitalOcean 
- - mention GitHub Education
-Web Server Explanation/Link
-
-### Web Server
-Nginx
-
-### API Server
-Flask + uwsgi (as opposed to uWSGI)
-
-### Database Setup
-MySQL
-
-### SSL Certificates
-Let's Encrypt
+In this second post, I will cover my second laboratory project, for which I built a wideband amplifier using 4 BJTs. Using a 15V DC supply and 62.6mW of power, it achieved a midband gain of -165 with a lower -3dB bandwidth of 13kHz and an upper -3dB bandwidth of 7.1MHz.
