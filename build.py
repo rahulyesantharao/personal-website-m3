@@ -429,6 +429,7 @@ class SiteBuilder:
                     if filename == "index.html":
                         html_to_build.append((dirpath, filename))
 
+        print("* Building HTML files")
         for path, filename in html_to_build:
             src_dir = path
             build_file = filename
@@ -452,10 +453,13 @@ class SiteBuilder:
                 pb.feed(data)
 
         # blog/projects
+        print("* Building Blog")
         for page, subpage, prefix in [("blog", "posts", "../../..")]:
             pagedir = os.path.join(self.srcdir, page)
             if os.path.exists(pagedir):
-                with open(os.path.join(pagedir, "data.json"), "r") as f:
+                with open(
+                    os.path.join(pagedir, "data.json"), "r", encoding="utf-8"
+                ) as f:
                     posts = json.load(f)
                 for i, post in enumerate(posts):
                     # convert dates to [date] object
@@ -481,10 +485,13 @@ class SiteBuilder:
             for i in range(len(posts)):
                 postdir = os.path.join(postdest, posts[i]["url"])
                 os.mkdir(postdir)
+                print(f"  - {posts[i]['url']} -> {pagedir}")
                 with PageBuilder(
                     pagedir, postdir, "index.html", self.file_hash, prefix, posts[i]
                 ) as pb:
-                    with open(os.path.join(pagedir, "post.html"), "r") as f:
+                    with open(
+                        os.path.join(pagedir, "post.html"), "r", encoding="utf-8"
+                    ) as f:
                         data = f.read()
                         pb.feed(data)
 
