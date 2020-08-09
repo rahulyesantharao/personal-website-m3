@@ -1,3 +1,10 @@
+### Spring 2020
+ - 6.115 - Microcomputer Project Lab
+ - 6.824 - Distributed Computer Systems Engineering
+ - 6.886 - Algorithm Engineering
+ - 6.S083 - Introduction to Computational Thinking with Applications to COVID-19
+ - 21M.294 - Popular Musics of the World
+ - 6.437 - Inference and Information (Listener)
 ### Fall 2019
  - 6.172 - Performance Engineering of Software Systems
  - 6.301 - Solid-State Circuits
