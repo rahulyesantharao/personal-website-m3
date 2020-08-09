@@ -424,7 +424,7 @@ class SiteBuilder:
         print("* Gathering HTML files to build")
         html_to_build = []
         for dirpath, _, filenames in os.walk(self.srcdir):
-            if dirpath.find("snippets") == -1:
+            if dirpath.find("snippets") == -1 and dirpath.find("projects") == -1:
                 for filename in filenames:
                     if filename == "index.html":
                         html_to_build.append((dirpath, filename))
@@ -514,7 +514,6 @@ class SiteBuilder:
         # delete unhashed css file
         os.remove(os.path.join(self.builddir, "css", "main.css"))
         os.remove(os.path.join(self.builddir, "scripts", "main.js"))
-        shutil.rmtree(os.path.join(self.builddir, "projects"))
 
         # postprocess
         print("* Postprocessing!")
