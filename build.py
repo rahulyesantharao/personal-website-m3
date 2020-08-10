@@ -15,6 +15,7 @@ import re
 import json
 from datetime import date
 import urllib
+import importlib.util
 
 import sass
 import cssutils
@@ -250,7 +251,10 @@ class PageBuilder(HTMLBuilder):
                 "scripts",
                 lambda x: not x.startswith("http"),
             )
+
         self.ofile.write(f"<{tag}{PageBuilder._build_attrs(attrs)}>")
+        if tag == "li":
+            self.ofile.write("<span>")
 
     def handle_startendtag(self, tag, attrs):
         """Parses start/end tags (`<.../>`), and performs the necessary compile steps.
@@ -318,8 +322,39 @@ class PageBuilder(HTMLBuilder):
                 attrs, "src", self.srcdir, "images", lambda x: not x.startswith("http")
             )
             self.ofile.write(f"<{tag}{PageBuilder._build_attrs(attrs)}/>")
+        elif tag == "python":
+            attrs = dict(attrs)
+
+            # load the module: https://stackoverflow.com/a/67692
+            module_name = attrs["src"][: attrs["src"].rfind(".")]
+            module_path = os.path.join(self.srcdir, os.path.normpath(attrs["src"]))
+            spec = importlib.util.spec_from_file_location(module_name, module_path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+
+            # run the code
+            old_cwd = os.getcwd()
+            os.chdir(self.srcdir)
+            data = mod.func()
+            os.chdir(old_cwd)
+
+            # recurse the data in
+            with PageBuilder(
+                self.srcdir,
+                self.builddir,
+                self.buildfile,
+                self.filehash,
+                self.topprefix,
+                attrs,
+            ) as pb:
+                pb.feed(data)
         else:
             self.ofile.write(f"<{tag}{PageBuilder._build_attrs(attrs)}/>")
+
+    def handle_endtag(self, tag):
+        if tag == "li":
+            self.ofile.write("</span>")
+        self.ofile.write(f"</{tag}>")
 
 
 # TODO: USE ffmpeg to compress images
