@@ -251,6 +251,12 @@ class PageBuilder(HTMLBuilder):
                 "scripts",
                 lambda x: not x.startswith("http"),
             )
+        elif tag == "a":
+            if (
+                len(list(filter(lambda t: t[0] == "target", attrs))) == 0
+            ):  # no target, default to external
+                attrs.append(("target", "_blank"))
+                attrs.append(("rel", "noopener noreferrer external"))
 
         self.ofile.write(f"<{tag}{PageBuilder._build_attrs(attrs)}>")
         if tag == "li":
