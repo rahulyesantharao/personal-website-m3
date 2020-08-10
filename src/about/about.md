@@ -1,9 +1,31 @@
-Hi! I’m Rahul. I'm a junior at the Massachusetts Institute of Technology, studying Course 6-2 (Electrical Engineering and Computer Science). Check out my coursework [here](/courses)! I am passionate about anything and everything relating to technology.
+Hi! I’m Rahul. I'm a rising senior at the Massachusetts Institute of Technology, studying Course 6-2 (Electrical Engineering and Computer Science). During my time at MIT, I have directed DevOps for [HackMIT](https://hackmit.org) and helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter.
 
-In my free time, I like to work on personal projects and write about them on my [blog](/blog). In the past, I have directed DevOps for [HackMIT](https://hackmit.org) and helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter.
+## Research
+ * From 2017-2018, I worked in the [Robot Locomotion Group](http://groups.csail.mit.edu/locomotion/) with Professor Russ Tedrake. I worked on constrained footstep planning through the use of mixed-integer convex optimization, implementing a footstep optimizer with the [Drake](https://drake.mit.edu/) framework [here](https://github.com/rahulyesantharao/drake-new-code).
+ * I am currently doing research with Professor Tim Kraska, working on [Tuplex](http://tuplex.cs.brown.edu/).
 
-I am currently doing research with Professor Tim Kraska in the Data System and AI Lab, working on [Tuplex](http://tuplex.cs.brown.edu/). In the summer of 2018, I worked as a software engineering intern on the infrastructure team at [Quora](https://www.quora.com). This past summer, I worked as a software engineering intern on the marketdata and tools/compilers teams at [Jane Street Capital](https://www.janestreet.com).
+## Work
+ * Summer 2018: SWE intern on the infrastructure team at [Quora](https://www.quora.com)
+ * Summer 2019: SWE intern on the marketdata and tools/compilers teams at [Jane Street Capital](https://www.janestreet.com)
+ * Summer 2020: FPGA intern on the hardware team at [Akuna Capital](https://akunacapital.com/)
 
+## Links
+ * [Coursework](/courses)
+ * [Blog](/blog)
+ * [Goodreads](https://www.goodreads.com/user/show/80899990-rahul-yesantharao)
+
+## A Few of My Favorite Things 
+* Movies
+    * Marvel Cinematic Universe🦸🏽
+    * Zootopia 🦊
+* TV Shows
+    * The Office 🏢
+    * Community 🏫
+* Sports
+    * NBA 🏀 
+    * Houston Rockets 🚀
+* Lists!
+
+<!--
 I was born and raised in Houston, Texas, just a couple minutes away from the Johnson Space Center. I graduated from Clear Lake High School as Salutatorian of the Class of 2017. During my time in high school, I was invited to the White House Science Fair in 2015 and 2016. I also competed in the USA Math and Computing Olympiads. In addition, I was the principal cellist of the [CLHS Orchestra](http://lakeorchestra.org/) and played in the Texas All State Orchestras (2015, [2016](https://www.youtube.com/watch?v=tWuUI1-IBZ8), [20](https://www.youtube.com/watch?v=AGhqUWLgGeM)[17](https://www.youtube.com/watch?v=wCT5MtY9xtw)).
-
-In my free time, I love reading just about any book I can get my hands on (check out my [Goodreads](https://www.goodreads.com/user/show/80899990-rahul-yesantharao)) and watching movies and TV shows. Some of my favorites include the Marvel Cinematic Universe, Zootopia, and The Office. I also love the NBA; in particular, the Houston Rockets.
+-->
