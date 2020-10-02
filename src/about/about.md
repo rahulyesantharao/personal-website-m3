@@ -2,7 +2,8 @@ Hi! I’m Rahul. I'm a rising senior at the Massachusetts Institute of Technolog
 
 ## Research
  * From 2017-2018, I worked in the [Robot Locomotion Group](http://groups.csail.mit.edu/locomotion/) with Professor Russ Tedrake. I worked on constrained footstep planning through the use of mixed-integer convex optimization, implementing a footstep optimizer with the [Drake](https://drake.mit.edu/) framework [here](https://github.com/rahulyesantharao/drake-new-code).
- * I am currently doing research with Professor Tim Kraska, working on [Tuplex](http://tuplex.cs.brown.edu/).
+ * I am currently doing research with Professors Tim Kraska and Malte Schwarzkopf, working on [Tuplex](http://tuplex.cs.brown.edu/).
+ * I am also currently working on a [SuperUROP](https://superurop.mit.edu/scholars/rahul-yesantharao/) under the MIT EECS Undergraduate Research and Innovation Scholar grant.
 
 ## Work
  * Summer 2018: SWE intern on the infrastructure team at [Quora](https://www.quora.com)
