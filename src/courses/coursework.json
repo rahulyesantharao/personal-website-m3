@@ -1,4 +1,13 @@
 [
+  ["Fall 2020", [
+    ["6.341", "Discrete-Time Signal Processing", ""],
+    ["6.438", "Algorithms for Inference", ""],
+    ["6.836", "Multicore Programming", ""],
+    ["6.UAR", "SuperUROP", "https://superurop.mit.edu/scholars/rahul-yesantharao/"],
+    ["21A.500", "Technology and Culture", ""],
+    ["21G.701", "Spanish I", ""],
+    ["21M.605", "Voice and Speech for the Actor", ""]
+  ]],
   ["Spring 2020", [
     ["6.115", "Microcomputer Project Lab", ""],
     ["6.824", "Distributed Computer Systems Engineering", ""],
