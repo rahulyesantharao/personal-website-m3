@@ -293,7 +293,7 @@ class PageBuilder(HTMLBuilder):
                 pb.feed(
                     markdown.markdown(
                         data,
-                        extensions=["codehilite"],
+                        extensions=["fenced_code", "codehilite"],
                         extension_configs={"codehilite": {"linenums": True}},
                     )
                 )

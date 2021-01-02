@@ -1,7 +1,7 @@
 .codehilitetable .hll { background-color: #eee8d5 }
 .codehilitetable  { background: #fdf6e3; color: #657b83 }
 .codehilitetable .c { color: #93a1a1; font-style: italic } /* Comment */
-.codehilitetable .err { color: #657b83; background-color: #dc322f } /* Error */
+/*.codehilitetable .err { color: #657b83; background-color: #dc322f } [> Error <]*/
 .codehilitetable .esc { color: #657b83 } /* Escape */
 .codehilitetable .g { color: #657b83 } /* Generic */
 .codehilitetable .k { color: #859900 } /* Keyword */
