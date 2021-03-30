@@ -1,5 +1,5 @@
 cssutils==1.0.2
 libsass==0.20.0
 Markdown==3.2.2
-Pygments==2.7.3
+Pygments==2.7.4
 six==1.12.0
