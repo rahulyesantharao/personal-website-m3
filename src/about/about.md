@@ -1,4 +1,4 @@
-Hi! I’m Rahul. I'm a senior at the Massachusetts Institute of Technology, studying Course 6-2 (Electrical Engineering and Computer Science). During my time at MIT, I have directed DevOps for [HackMIT](https://hackmit.org) and helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter.
+Hi! I’m Rahul. I'm a senior/first-semester MEng student at the Massachusetts Institute of Technology, studying Course 6-2 (Electrical Engineering and Computer Science). During my time at MIT, I have directed DevOps for [HackMIT](https://hackmit.org) and helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter.
 
 ## Research
  * From 2017-2018, I worked in the [Robot Locomotion Group](http://groups.csail.mit.edu/locomotion/) with Professor Russ Tedrake. I worked on constrained footstep planning through the use of mixed-integer convex optimization, implementing a footstep optimizer with the [Drake](https://drake.mit.edu/) framework [here](https://github.com/rahulyesantharao/drake-new-code).
