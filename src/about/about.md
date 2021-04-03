@@ -11,7 +11,7 @@ Hi! I’m Rahul. I'm a senior/first-semester MEng student at the Massachusetts I
  * Summer 2020: FPGA intern on the hardware team at [Akuna Capital](https://akunacapital.com/)
 
 ## Links
- * [Coursework](/courses)
+ * <a target="_self" href="/courses">Coursework</a>
  * [Blog](/blog)
  * [Goodreads](https://www.goodreads.com/user/show/80899990-rahul-yesantharao)
 
