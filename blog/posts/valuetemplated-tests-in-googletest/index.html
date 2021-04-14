@@ -1,0 +1,130 @@
+<!doctypehtml><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta charset=UTF-8><link rel=apple-touch-icon sizes=180x180 href="/apple-touch-icon.png?v=ngkk92kKld"><link rel=icon type=image/png sizes=32x32 href="/favicon-32x32.png?v=ngkk92kKld"><link rel=icon type=image/png sizes=194x194 href="/favicon-194x194.png?v=ngkk92kKld"><link rel=icon type=image/png sizes=192x192 href="/android-chrome-192x192.png?v=ngkk92kKld"><link rel=icon type=image/png sizes=16x16 href="/favicon-16x16.png?v=ngkk92kKld"><link rel=manifest href="/manifest.json?v=ngkk92kKld"><link rel=mask-icon href="/safari-pinned-tab.svg?v=ngkk92kKld"color=#2b669b><link rel="shortcut icon"href="/favicon.ico?v=ngkk92kKld"><meta name=msapplication-TileColor content=#2b669b><meta name=msapplication-TileImage content="/mstile-144x144.png?v=ngkk92kKld"><meta name=theme-color content=#2b669b><meta property=og:url content=https://rahulyesantharao.com/blog/posts/valuetemplated-tests-in-googletest><meta property=og:type content=article><meta property=og:title content="Value-Templated Tests in Googletest"><meta property=og:description content="Hacking compile-time value parameters into Googletest."><meta property=og:image content=https://rahulyesantharao.com/images/ry.7af6e3a8550f5db9ffe794a2bed497c3.png><meta property=og:image:secure_url content=https://rahulyesantharao.com/images/ry.7af6e3a8550f5db9ffe794a2bed497c3.png><meta property=og:image:type content=image/png><meta property=og:image:width content=805><meta property=og:image:height content=805><meta property=twitter:card content=summary><meta property=twitter:site content=@rahulvgy><meta property=twitter:creator content=@rahulvgy><meta property=twitter:title content="Value-Templated Tests in Googletest"><meta property=twitter:description content="Hacking compile-time value parameters into Googletest."><meta property=twitter:image content=https://rahulyesantharao.com/images/ry.7af6e3a8550f5db9ffe794a2bed497c3.png><meta property=twitter:image:alt content="Hacking compile-time value parameters into Googletest."><link rel=stylesheet href=https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css><link rel=stylesheet href=../../../css/main.507e1f48b2db4f8c79ea01aa9caf8aa0.css><title>Value-Templated Tests in Googletest | Blog | Rahul Yesantharao</title><header><nav class=navbar><div class=navbar-menu-drawer id=navbar-menu-drawer><div class=navbar-item><a target=_self href=/about/ >ABOUT</a></div><div class=navbar-item><a target=_self href=/courses/ >COURSES</a></div><div class=navbar-item><a target=_self href=/blog/ class=active>BLOG</a></div></div><div class=navbar-left><div class="navbar-item is-hidden-desktop"><div class=navbar-burger id=navbar-burger onclick=toggleMenu()><span></span> <span></span> <span></span></div></div><div class=navbar-item id=logo><a target=_self href=/ ><span>Rahul Y</span></a></div></div><div class=navbar-menu-desktop><div class=navbar-item><a target=_self href=/about/ >ABOUT</a></div><div class=navbar-item><a target=_self href=/courses/ >COURSES</a></div><div class=navbar-item><a target=_self href=/blog/ class=active>BLOG</a></div></div></nav></header><section class="container-fluid page-title"id=blogHeader><div class=container><div class="columns is-centered"><div class="column is-12-mobile is-8-desktop is-8-tablet"><h1><span>/usr/etc/rahul/*</span></h1></div></div></div></section><section class="container top-pad"><div class="columns is-centered"><div class="column is-12-mobile is-8-desktop is-8-tablet"><h2 style=margin-top:.6rem;font-size:4rem><span>Value-Templated Tests in Googletest</span></h2><h3 style=font-size:1rem;color:#2b669b>April 13, 2021</h3><div class="text blog-post"><p>I have recently been using <a href=https://github.com/google/googletest target=_blank rel="noopener noreferrer external">Googletest</a> quite a bit for various projects I'm working on. For the most part, I've had a great experience with this: after a little bit of <a href=https://github.com/google/googletest/blob/master/googletest/README.md#incorporating-into-an-existing-cmake-project target=_blank rel="noopener noreferrer external">setup hassle</a>, you get a very extensible unit test framework completely integrated with CMake!<h2>A Basic Problem</h2><p>Last week, however, I ran into a problem, which I will briefly set up here:<p>I have a function that is templated by non-type parameters. For example,<table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1
+2
+3
+4</pre></div><td class=code><div class=codehilite><pre><span></span><code><span class=k>template</span><span class=o>&lt;</span><span class=kt>bool</span> <span class=n>parallel</span><span class=o>></span>
+<span class=kt>int</span> <span class=n>sort</span><span class=p>(</span><span class=n>std</span><span class=o>::</span><span class=n>vector</span><span class=o>&lt;</span><span class=kt>int</span><span class=o>></span> <span class=o>&</span><span class=n>a</span><span class=p>)</span> <span class=p>{</span>
+  <span class=c1>// sorts in parallel if [parallel], else in serial.</span>
+<span class=p>}</span>
+</code></pre></div></table><p><span class=caption>A templated sort function that I'd like to test.</span><p>I want to write the same set of unit tests for the serial and parallel versions of this function, something like the following:<table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1
+2
+3
+4
+5
+6</pre></div><td class=code><div class=codehilite><pre><span></span><code><span class=k>template</span><span class=o>&lt;</span><span class=kt>bool</span> <span class=n>parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>SortTest</span> <span class=o>:</span> <span class=k>public</span> <span class=n>testing</span><span class=o>::</span><span class=n>Test</span> <span class=p>{};</span>
+
+<span class=n>TEST</span><span class=o>*</span><span class=p>(</span><span class=n>SortTest</span><span class=p>,</span> <span class=n>Test1</span><span class=p>)</span> <span class=p>{</span>
+  <span class=c1>// test sort<parallel>(...)</parallel></span>
+<span class=p>}</span>
+</code></pre></div></table><p><span class=caption>Ideally, I'd be able to test it like this.</span><p>However, when I looked through the <a href=https://github.com/google/googletest/blob/master/docs/advanced.md target=_blank rel="noopener noreferrer external">advanced guide</a> for Googletest, I saw that they only offer two generalizable testing options:<ul><li><span><a href=https://github.com/google/googletest/blob/master/docs/advanced.md#value-parameterized-tests target=_blank rel="noopener noreferrer external">Value-Parameterized</a></span><li><span><a href=https://github.com/google/googletest/blob/master/docs/advanced.md#typed-tests target=_blank rel="noopener noreferrer external">Typed</a> (I like to refer to these as type-templated, for parallel structure).</span></ul><p>Unfortunately, this doesn't quite cut it. Specifically, the value parameters of value-parameterized tests (accessed through <code>GetParam()</code> within tests) are not compile-time constants, so I can't use them to template my function as I described above. Now, my first solution for this conundrum was to do the following with value-parameterized tests:<table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div><td class=code><div class=codehilite><pre><span></span><code><span class=k>class</span> <span class=nc>SortTest</span> <span class=o>:</span> <span class=k>public</span> <span class=n>testing</span><span class=o>::</span><span class=n>TestWithParam</span><span class=o>&lt;</span><span class=kt>bool</span><span class=o>></span> <span class=p>{};</span>
+
+<span class=n>TEST_P</span><span class=p>(</span><span class=n>SortTest</span><span class=p>,</span> <span class=n>Test1</span><span class=p>)</span> <span class=p>{</span>
+  <span class=k>if</span><span class=p>(</span><span class=n>GetParam</span><span class=p>())</span> <span class=p>{</span>
+    <span class=c1>// test sort<true>(...)</true></span>
+  <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+    <span class=c1>// test sort<false>(...)</false></span>
+  <span class=p>}</span>
+<span class=p>}</span>
+</code></pre></div></table><p><span class=caption>A hacky solution to convert runtime constants to compile-time constants...not very satisfying.</span><p>This works, but it doesn't feel very satisfying (definitely not blog-post worthy!). More concretely though, this is not as extensible as I would like.<h2>A More Involved Problem</h2><p>In particular, consider this new setup (which is closer to what I was working with):<table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div><td class=code><div class=codehilite><pre><span></span><code><span class=k>template</span><span class=o>&lt;</span><span class=kt>bool</span> <span class=n>parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>BST</span> <span class=p>{</span>
+  <span class=c1>// interface for a BST, with basic shared functionality</span>
+<span class=p>};</span>
+
+<span class=k>template</span><span class=o>&lt;</span><span class=kt>bool</span> <span class=n>parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>AVL</span> <span class=o>:</span> <span class=k>public</span> <span class=n>BST</span><span class=o>&lt;</span><span class=n>parallel</span><span class=o>></span> <span class=p>{</span>
+  <span class=c1>// implement the BST interface with AVL heuristics</span>
+<span class=p>};</span>
+
+<span class=k>template</span><span class=o>&lt;</span><span class=kt>bool</span> <span class=n>parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>RBT</span> <span class=o>:</span> <span class=k>public</span> <span class=n>BST</span><span class=o>&lt;</span><span class=n>parallel</span><span class=o>></span> <span class=p>{</span>
+  <span class=c1>// implement the BST interface with RBT heuristics</span>
+<span class=p>};</span>
+</code></pre></div></table><p><span class=caption>A new minimal example of classes I'd like to test.</span><p>Then, I would like to write shared tests for all trees that implement the <code>BST</code> interface. However, I would like to do some tests that are specific to each type (i.e. verify that the nodes are laid out in the correct order in memory, for example). Even with these specific tests, though, I want to have some underlying shared structure (i.e. it will construct and return a tree of a given - templated - type which I can then run specific tests on). The basic structure of what I would like (but is again impossible on Googletest) is shown below:<table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div><td class=code><div class=codehilite><pre><span></span><code><span class=k>template</span><span class=o>&lt;</span><span class=k>class</span> <span class=nc>Tree</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>BSTTestResources</span> <span class=o>:</span> <span class=k>public</span> <span class=o>::</span><span class=n>testing</span><span class=o>::</span><span class=n>Test</span> <span class=p>{</span>
+  <span class=k>public</span><span class=o>:</span>
+  <span class=c1>// provide several shared resources for constructing BST tests</span>
+
+  <span class=c1>// for example:</span>
+  <span class=k>static</span> <span class=n>Tree</span> <span class=n>CONSTRUCT_SIZE_100</span><span class=p>()</span> <span class=p>{</span> <span class=cm>/*...*/</span> <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=k>template</span><span class=o>&lt;</span><span class=kt>bool</span> <span class=n>parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>TestAVLStructure</span> <span class=o>:</span> <span class=k>public</span> <span class=n>BSTTestResources</span><span class=o>&lt;</span><span class=n>AVL</span><span class=o>&lt;</span><span class=n>parallel</span><span class=o>>></span> <span class=p>{};</span>
+
+<span class=k>template</span><span class=o>&lt;</span><span class=kt>bool</span> <span class=n>parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>TestRBTStructure</span> <span class=o>:</span> <span class=k>public</span> <span class=n>BSTTestResources</span><span class=o>&lt;</span><span class=n>RBT</span><span class=o>&lt;</span><span class=n>parallel</span><span class=o>>></span> <span class=p>{};</span>
+</code></pre></div></table><p><span class=caption>Ideally, I would have this test structure. The hack from before no longer works.</span><p>As noted before, however, this is impossible: we can't template test classes with values. Furthermore, our previous hack of branching on the value of the parameter no longer works either: we can't use <code>GetParam()</code> to access the parameter in the template list for the base class <code>BSTTestResources</code>. Granted, this seems to be a somewhat contrived example, but it came up in my real usage, and I imagine others have run into it at some point.<p>You could get around this in theory by letting <code>TestAVLStructure</code> and <code>TestRBTStructure</code> both be Typed test classes, and just passing the entire <code>AVL<parallel></parallel></code> or <code>RBT<parallel></parallel></code> (respectively) class in to generate the tests. This works, and I do use it for some of my tests. However, it doesn't express the same level of specificity that the structure I've written above does - the tests above impose, for example, the restriction that <code>TestAVLStructure</code> is only for the class <code>AVL&lt;></code>, and I'd like to maintain this semantic structure.<h2>A Solution</h2><p>Luckily, there is a way to get around the entire issue. Specifically, we can (also hackily) encode values into types, and use type-parameterized tests to pass compile-time values. In code,<table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre>1
+2
+3
+4
+5
+6
+7</pre></div><td class=code><div class=codehilite><pre><span></span><code><span class=k>class</span> <span class=nc>True</span> <span class=p>{</span>
+  <span class=k>static</span> <span class=k>constexpr</span> <span class=kt>bool</span> <span class=n>v</span> <span class=o>=</span> <span class=nb>true</span><span class=p>;</span>
+<span class=p>};</span>
+
+<span class=k>class</span> <span class=nc>False</span> <span class=p>{</span>
+  <span class=k>static</span> <span class=k>constexpr</span> <span class=kt>bool</span> <span class=n>v</span> <span class=o>=</span> <span class=nb>false</span><span class=p>;</span>
+<span class=p>};</span>
+</code></pre></div></table><p><span class=caption>Encode parameter values into types!</span><p>Now, I can write the above tree tests as:<table class=codehilitetable><tr><td class=linenos><div class=linenodiv><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div><td class=code><div class=codehilite><pre><span></span><code><span class=k>template</span><span class=o>&lt;</span><span class=k>class</span> <span class=nc>Tree</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>BSTTestResources</span> <span class=o>:</span> <span class=k>public</span> <span class=o>::</span><span class=n>testing</span><span class=o>::</span><span class=n>Test</span> <span class=p>{</span>
+  <span class=k>public</span><span class=o>:</span>
+  <span class=c1>// provide several shared resources for constructing BST tests</span>
+
+  <span class=c1>// for example:</span>
+  <span class=k>static</span> <span class=n>Tree</span> <span class=n>CONSTRUCT_SIZE_100</span><span class=p>()</span> <span class=p>{</span> <span class=cm>/*...*/</span> <span class=p>}</span>
+<span class=p>};</span>
+
+<span class=k>template</span><span class=o>&lt;</span><span class=k>typename</span> <span class=nc>Parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>TestAVLStructure</span> <span class=o>:</span> <span class=k>public</span> <span class=n>BSTTestResources</span><span class=o>&lt;</span><span class=n>AVL</span><span class=o>&lt;</span><span class=n>Parallel</span><span class=o>::</span><span class=n>v</span><span class=o>>></span> <span class=p>{};</span>
+
+<span class=k>template</span><span class=o>&lt;</span><span class=k>typename</span> <span class=nc>Parallel</span><span class=o>></span>
+<span class=k>class</span> <span class=nc>TestRBTStructure</span> <span class=o>:</span> <span class=k>public</span> <span class=n>BSTTestResources</span><span class=o>&lt;</span><span class=n>RBT</span><span class=o>&lt;</span><span class=n>Parallel</span><span class=o>::</span><span class=n>v</span><span class=o>>></span> <span class=p>{};</span>
+</code></pre></div></table><p><span class=caption>Finally! "Value"-templated tests.</span><p>This accomplishes all my goals: I get to share an underlying test class with shared resources and I get to maintain the semantic structure of my specialized tests, which should only be applicable to the tree type that they are written for. The trick here is that types in C++ can be arbitrarily augmented with values by using <code>static constexpr</code>. I really liked this idea more broadly, because it gives types some notion of value, so it lets us start thinking about types as ever-so-slightly closer to first-class citizens they normally are in C++.</div></div><div class="column is-12-mobile is-8-desktop is-8-tablet is-flex text"><p class=top-pad-mobile><b>Rahul Yesantharao</b><br><span style=font-size:1rem>Student, Programmer, Artist.<br><i class="fa fa-map-marker"aria-hidden=true></i>   Cambridge, MA</span><p class=is-right><b>Share this post</b><br><span style=font-size:1rem><a target=_blank rel=noopener href="https://twitter.com/intent/tweet?url=https://rahulyesantharao.com/blog/posts/valuetemplated-tests-in-googletest&text=Value-Templated%20Tests%20in%20Googletest"><i class="fa fa-twitter"aria-hidden=true></i> </a>  <a target=_blank rel=noopener href="https://facebook.com/sharer/sharer.php?u=https://rahulyesantharao.com/blog/posts/valuetemplated-tests-in-googletest"><i class="fa fa-facebook"aria-hidden=true></i> </a>  <a target=_blank rel=noopener href="http://www.linkedin.com/shareArticle?mini=true&url=https://rahulyesantharao.com/blog/posts/valuetemplated-tests-in-googletest&title=Value-Templated%20Tests%20in%20Googletest&summary=Hacking%20compile-time%20value%20parameters%20into%20Googletest.&source=rahulyesantharao.com"><i class="fa fa-linkedin"aria-hidden=true></i></a></span></div></div><div class="columns is-centered"><div class="column is-12-mobile is-8-desktop is-8-tablet is-flex text"><p><a target=_self href=/blog/ >← Back To Blog</a></div></div></section><footer><p><a href=https://twitter.com/rahulvgy aria-label=Twitter target=_blank rel="noopener noreferrer external"><i class="fa fa-twitter-square"aria-hidden=true title="View Rahul's Twitter"></i> </a>   <a href=https://github.com/rahulyesantharao/ aria-label=GitHub target=_blank rel="noopener noreferrer external"><i class="fa fa-github"aria-hidden=true title="View Rahul's GitHub"></i> </a>   <a href=https://www.linkedin.com/in/rahulyesantharao aria-label=LinkedIn target=_blank rel="noopener noreferrer external"><i class="fa fa-linkedin-square"aria-hidden=true title="View Rahul's LinkedIn"></i></a><p><i class="fa fa-pencil"aria-hidden=true></i> with <i class="fa fa-code"aria-hidden=true></i> by Rahul Yesantharao</footer><div id=sidenav-overlay onclick=toggleMenu()></div><script src=../../../scripts/main.6304c5800ef16505f2aec5e8c32fa40b.js></script>
