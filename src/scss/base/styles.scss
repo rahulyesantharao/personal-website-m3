@@ -130,6 +130,7 @@ h3, h4 {
   .linenos {
     padding-right: 10px;
   }
+  margin: 0.5rem 0; // match text
 }
 
 .is-flex {
@@ -155,4 +156,15 @@ h3, h4 {
 
 .is-justified {
   text-align: justify;
+}
+
+// Other
+span.caption {
+  display:block;
+  width:100%;
+  text-align:center;
+  font-style:italic;
+  color:$color-caption;
+  font-size: $font-size-caption;
+  margin: -0.5rem 0 0 0; // get closer to code
 }

@@ -10,6 +10,7 @@ $color-selection: lighten(#2b669b, 50%);
 
 // Font Colors
 $color-font: black; //#797979;
+$color-caption: lighten($color-font, 20%);
 
 $color-link: lighten(#2b669b, 30%);
 $color-link-hover: darken($color-link, 30%);
@@ -30,6 +31,7 @@ $font-weight-bold: 700;
 
 $line-height-primary: 1.5;
 
+$font-size-caption: 1.0rem;
 $font-size-logo: 1.4rem;
 $font-size-h: 3rem, 2rem, 1.2rem;
 

@@ -27,5 +27,10 @@
     "post_date": "2018-11-17",
     "update_date": "2018-11-19",
     "description": "A detailed overview of the DEFLATE algorithm used by gzip for text file compression, including a full reimplementation of an unzip utility."
+  },
+  {
+    "title":"Value-Templated Tests in Googletest",
+    "post_date": "2021-04-13",
+    "description": "Hacking compile-time value parameters into Googletest."
   }
 ]
