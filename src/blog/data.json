@@ -31,6 +31,7 @@
   {
     "title":"Value-Templated Tests in Googletest",
     "post_date": "2021-04-13",
-    "description": "Hacking compile-time value parameters into Googletest."
+    "update_date": "2021-04-14",
+    "description": "Hacking compile-time value parameters into Googletest. Or, accidentally discovering type traits."
   }
 ]
