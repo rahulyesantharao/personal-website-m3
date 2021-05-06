@@ -2,13 +2,15 @@ Hi! I’m Rahul. I'm a senior/first-semester MEng student at the Massachusetts I
 
 ## Research
  * From 2017-2018, I worked in the [Robot Locomotion Group](http://groups.csail.mit.edu/locomotion/) with Professor Russ Tedrake. I worked on constrained footstep planning through the use of mixed-integer convex optimization, implementing a footstep optimizer with the [Drake](https://drake.mit.edu/) framework [here](https://github.com/rahulyesantharao/drake-new-code).
- * I am currently doing research with Professors Tim Kraska and Malte Schwarzkopf, working on [Tuplex](http://tuplex.cs.brown.edu/).
- * I am also currently working on a [SuperUROP](https://superurop.mit.edu/scholars/rahul-yesantharao/) under the MIT EECS Undergraduate Research and Innovation Scholar grant.
+ * Since 2019, I have been doing research with Professors Tim Kraska and Malte Schwarzkopf, working on [Tuplex](http://tuplex.cs.brown.edu/).
+    * In 2021, I am pursuing this research as a [SuperUROP](https://superurop.mit.edu/scholars/rahul-yesantharao/) under the MIT EECS Undergraduate Research and Innovation Scholar grant.
+ * I am also currently doing my MEng research with Professor Julian Shun, working on parallel data structures.
 
 ## Work
  * Summer 2018: SWE intern on the infrastructure team at [Quora](https://www.quora.com)
  * Summer 2019: SWE intern on the marketdata and tools/compilers teams at [Jane Street Capital](https://www.janestreet.com)
  * Summer 2020: FPGA intern on the hardware team at [Akuna Capital](https://akunacapital.com/)
+ * Winter 2021: FPGA intern at [Jane Street Capital](https://www.janestreet.com)
 
 ## Links
  * <a target="_self" href="/courses">Coursework</a>
