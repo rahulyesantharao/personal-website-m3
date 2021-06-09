@@ -19,8 +19,21 @@ def func():
         for (semester, classes) in data:
             ret += f"<h3>{get_semester_emoji(semester)} {semester}</h3>"
             ret += "<ul>"
-            for (class_number, class_name, class_proj_link) in classes:
-                ret += f'<li><a href="http://student.mit.edu/catalog/search.cgi?search={class_number}">{class_number}</a> - {class_name}'
+            for clas in classes:
+
+                def extract(idx):
+                    return clas[idx] if idx < len(clas) else ""
+
+                class_number = extract(0)
+                class_name = extract(1)
+                class_proj_link = extract(2)
+                class_role = extract(3)
+
+                class_txt = (
+                    f"[{class_role}] {class_number}" if class_role else class_number
+                )
+
+                ret += f'<li><a href="http://student.mit.edu/catalog/search.cgi?search={class_number}">{class_txt}</a> - {class_name}'
                 if class_proj_link:
                     ret += f" (<a href={class_proj_link}>project</a>)"
                 ret += "</li>"

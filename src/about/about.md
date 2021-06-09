@@ -1,9 +1,9 @@
-Hi! I’m Rahul. I'm a senior/first-semester MEng student at the Massachusetts Institute of Technology, studying Course 6-2 (Electrical Engineering and Computer Science). During my time at MIT, I have directed DevOps for [HackMIT](https://hackmit.org) and helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter.
+Hi! I’m Rahul. I'm an MEng student at the Massachusetts Institute of Technology, where I majored in Course 6-2 (Electrical Engineering and Computer Science) as an undergrad. During my time at MIT, I have directed DevOps for [HackMIT](https://hackmit.org), helped run the [MIT IEEE/ACM](http://ieeeacm.mit.edu/) student chapter, and TA'd for [6.006 (Introduction to Algorithms)](https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-006-introduction-to-algorithms-fall-2011/).
 
 ## Research
  * From 2017-2018, I worked in the [Robot Locomotion Group](http://groups.csail.mit.edu/locomotion/) with Professor Russ Tedrake. I worked on constrained footstep planning through the use of mixed-integer convex optimization, implementing a footstep optimizer with the [Drake](https://drake.mit.edu/) framework [here](https://github.com/rahulyesantharao/drake-new-code).
  * Since 2019, I have been doing research with Professors Tim Kraska and Malte Schwarzkopf, working on [Tuplex](http://tuplex.cs.brown.edu/).
-    * In 2021, I am pursuing this research as a [SuperUROP](https://superurop.mit.edu/scholars/rahul-yesantharao/) under the MIT EECS Undergraduate Research and Innovation Scholar grant.
+    * In 2020-2021, I pursued this research as a [SuperUROP](https://superurop.mit.edu/scholars/rahul-yesantharao/) under the MIT EECS Undergraduate Research and Innovation Scholar grant.
  * I am also currently doing my MEng research with Professor Julian Shun, working on parallel data structures.
 
 ## Work
