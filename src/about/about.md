@@ -2,8 +2,9 @@ Hi! I’m Rahul. I'm an MEng student at the Massachusetts Institute of Technolog
 
 ## Research
  * From 2017-2018, I worked in the [Robot Locomotion Group](http://groups.csail.mit.edu/locomotion/) with Professor Russ Tedrake. I worked on constrained footstep planning through the use of mixed-integer convex optimization, implementing a footstep optimizer with the [Drake](https://drake.mit.edu/) framework [here](https://github.com/rahulyesantharao/drake-new-code).
- * Since 2019, I have been doing research with Professors Tim Kraska and Malte Schwarzkopf, working on [Tuplex](http://tuplex.cs.brown.edu/).
+ * Since 2019, I have been doing research with Professors Tim Kraska and Malte Schwarzkopf, working on [Tuplex](http://tuplex.cs.brown.edu/) - open source [here](https://github.com/tuplex/tuplex).
     * In 2020-2021, I pursued this research as a [SuperUROP](https://superurop.mit.edu/scholars/rahul-yesantharao/) under the MIT EECS Undergraduate Research and Innovation Scholar grant.
+    * In June 2021, we published this work in SIGMOD '21 - see the paper [here](https://dl.acm.org/doi/10.1145/3448016.3457244).
  * I am also currently doing my MEng research with Professor Julian Shun, working on parallel data structures.
 
 ## Work
