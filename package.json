@@ -18,9 +18,10 @@
   "homepage": "https://github.com/rahulyesantharao/personal-website-m3#readme",
   "dependencies": {
     "autoprefixer": "^9.8.6",
-    "cssnano": "^4.1.10",
+    "cssnano": "^5.1.13",
     "html-minifier": "^4.0.0",
-    "postcss-cli": "^7.1.2",
+    "postcss": "^8.4.16",
+    "postcss-cli": "^10.0.0",
     "postcss-uncss": "^0.17.0",
     "uglify-js": "^3.13.3",
     "uncss": "^0.17.1"
