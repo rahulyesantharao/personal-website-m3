@@ -2,10 +2,13 @@ Hi! I’m Rahul. I'm an MEng student at the Massachusetts Institute of Technolog
 
 ## Research
  * From 2017-2018, I worked in the [Robot Locomotion Group](http://groups.csail.mit.edu/locomotion/) with Professor Russ Tedrake. I worked on constrained footstep planning through the use of mixed-integer convex optimization, implementing a footstep optimizer with the [Drake](https://drake.mit.edu/) framework [here](https://github.com/rahulyesantharao/drake-new-code).
- * Since 2019, I have been doing research with Professors Tim Kraska and Malte Schwarzkopf, working on [Tuplex](http://tuplex.cs.brown.edu/) - open source [here](https://github.com/tuplex/tuplex).
+ * From 2019-2021, I worked with Leonhard Spiegelberg under Professors Tim Kraska and Malte Schwarzkopf on [Tuplex](http://tuplex.cs.brown.edu/) - open source [here](https://github.com/tuplex/tuplex).
     * In 2020-2021, I pursued this research as a [SuperUROP](https://superurop.mit.edu/scholars/rahul-yesantharao/) under the MIT EECS Undergraduate Research and Innovation Scholar grant.
-    * In June 2021, we published this work in SIGMOD '21 - see the paper [here](https://dl.acm.org/doi/10.1145/3448016.3457244).
- * I am also currently doing my MEng research with Professor Julian Shun, working on parallel data structures.
+    * In June 2021, we published this work in [SIGMOD '21](https://2021.sigmod.org/) - see the paper [here](https://dl.acm.org/doi/10.1145/3448016.3457244).
+    * At [SIGMOD '22 Reproducibility](https://reproducibility.sigmod.org/reports.html), Tuplex received all the reproducibility badges - see the report [here](https://reproducibility.sigmod.org/rep_rep/2022/Lehner-SIGMODReproReport16.pdf).
+ * In 2022, I did my MEng research with Professor Julian Shun, working on parallel, batch-dynamic kd-trees.
+    * I wrote my [thesis]() and a condensed [paper](https://arxiv.org/abs/2112.06188) based on this work.
+    * We also published this work in [ESA 2022](https://algo2022.eu/esa/) as part of the larger ParGeo framework - see the paper [here](https://doi.org/10.4230/LIPIcs.ESA.2022.88).
 
 ## Work
  * Summer 2018: SWE intern on the infrastructure team at [Quora](https://www.quora.com)
