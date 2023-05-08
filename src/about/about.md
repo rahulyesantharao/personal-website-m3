@@ -11,6 +11,7 @@ Previously, I completed my undergrad (BS) and master's (MEng) in EECS at the Mas
  * In 2021-2022, I did my MEng research with Professor Julian Shun, working on parallel, batch-dynamic kd-trees.
     * I wrote my [thesis](https://dspace.mit.edu/handle/1721.1/143277) and a condensed [paper](https://arxiv.org/abs/2112.06188) based on this work.
     * We also published this work in [ESA 2022](https://algo2022.eu/esa/) as part of the larger ParGeo framework - see the paper [here](https://doi.org/10.4230/LIPIcs.ESA.2022.88).
+ * In 2022, I competed as part of a team in the [ZPrize 2022](https://www.zprize.io/blog/announcing-zprize-results). We developed a mixed FPGA/CPU Multi-Scalar Multiplication accelerator for the [BLS12-377](https://eips.ethereum.org/EIPS/eip-2539) G1 elliptic curve. For our design, we developed many novel techniques and won 1st place, establishing the first open-source FPGA implementation of this problem. See our [blog post](https://blog.janestreet.com/zero-knowledge-fpgas-hardcaml/), [detailed technical write-up](https://zprize.hardcaml.com/), and [GitHub](https://github.com/fyquah/hardcaml_zprize).
 
 ## Internships 
  * Summer 2018: SWE intern on the infrastructure team at [Quora](https://www.quora.com)
